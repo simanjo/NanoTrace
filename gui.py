@@ -2,6 +2,31 @@ import dearpygui.dearpygui as dpg
 from fast5_research.fast5_bulk import BulkFast5
 import numpy as np
 
+def _is_active_channel(fname, channel):
+    with BulkFast5(fname) as fh:
+        raw_data = fh.get_raw(channel)
+    baseline = None
+
+    try:
+        if np.abs(np.mean(raw_data)) > 1:
+            baseline = int(np.median(raw_data[np.logical_and(raw_data > 150, raw_data < 350)]))
+    finally:
+        return (baseline is not None)
+
+
+def _get_active_channels(fname):
+    return [str(c) for c in range(1,127) if _is_active_channel(fname, c)]
+
+def set_active_channels():
+    fname = dpg.get_value("file")
+    if fname is None:
+        return
+
+    chans = _get_active_channels(fname)
+    dpg.configure_item("channel", items=chans)
+
+
+
 def choose_file(sender, app_data, user_data):
     fname = list(app_data['selections'].values())[0]
     dpg.set_value("file", fname)
@@ -35,7 +60,9 @@ def main():
         with dpg.group(horizontal=True):
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog"))
             dpg.add_text("Selected File: ", tag="file")
-        dpg.add_combo(tag="channel", callback=choose_channel)
+        with dpg.group(horizontal=True):
+            dpg.add_combo(tag="channel", callback=choose_channel)
+            dpg.add_button(label="Get active channels", callback=set_active_channels)
 
         with dpg.plot(label="Squiggle Plot", height=-1, width=-1):
             dpg.add_plot_legend()
