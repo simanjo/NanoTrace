@@ -1,0 +1,4 @@
+[submodule "fast5_research"]
+	path = fast5_research
+	url = https://github.com/simanjo/fast5_research.git
+	branch = bulkfiles
