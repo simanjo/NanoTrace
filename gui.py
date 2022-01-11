@@ -7,14 +7,20 @@ def _is_active_channel(fname, channel):
         raw_data = fh.get_raw(channel)
 
     return np.abs(np.mean(raw_data)) > 1 and len(raw_data[np.logical_and(raw_data > 150, raw_data < 350)]) > 0
-    # baseline = None
 
-
+def _update_channel_progress(channel):
+    dpg.set_value("Progress Bar", (channel-1)/126)
+    dpg.configure_item("Progress Bar", overlay=f"Checking channel {channel}/126")
+    return True
 
 def _get_active_channels(fname):
+    dpg.configure_item("Progress Bar", show=True)
+
     result = [
-        c for c in range(1,127) if _is_active_channel(fname, c)
+        c for c in range(1,127) if _update_channel_progress(c) and _is_active_channel(fname, c)
     ]
+
+    dpg.configure_item("Progress Bar", show=False)
     return result
 
 def set_active_channels():
@@ -49,8 +55,9 @@ def choose_channel(sender, app_data, user_data):
         raw_data = fh.get_raw(c)
 
     dpg.set_value('raw_series', [list(range(0,len(raw_data))), raw_data])
-    dpg.set_axis_limits_auto("x_axis")
-    dpg.set_axis_limits_auto("y_axis")
+    dpg.set_axis_limits_auto("raw_x_axis")
+    dpg.set_axis_limits_auto("raw_y_axis")
+
 
 ##############################################################################
 
@@ -74,6 +81,8 @@ def main():
             dpg.add_button(label="Get active channels", callback=set_active_channels)
         with dpg.group(tag="func_choose"):
             dpg.add_button(label="Show Squiggle Plot", callback=choose_channel)
+
+        dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
 
     with dpg.window(label="Raw Data", width=800, height=600, tag="raw-data"):
         with dpg.plot(label="Squiggle Plot", height=-1, width=-1):
