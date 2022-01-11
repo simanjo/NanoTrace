@@ -1,6 +1,7 @@
 import dearpygui.dearpygui as dpg
 from fast5_research.fast5_bulk import BulkFast5
 import numpy as np
+import statsmodels.nonparametric.kde as kde
 
 def _is_active_channel(fname, channel):
     with BulkFast5(fname) as fh:
@@ -62,6 +63,22 @@ def choose_channel(sender, app_data, user_data):
     dpg.set_axis_limits_auto("raw_x_axis")
     dpg.set_axis_limits_auto("raw_y_axis")
 
+def show_kde(sender, app_data, user_data):
+    c = dpg.get_value("channel")
+    fname = dpg.get_value("filepath")
+    if not fname or not c:
+        return
+
+    with BulkFast5(fname) as fh:
+        raw_data = fh.get_raw(c)
+
+    dpg.configure_item("kde-data", show=True)
+    kdes = kde.KDEUnivariate(raw_data)
+    kdes.fit()
+    dpg.set_value('raw_density', [kdes.support, kdes.density])
+    dpg.set_axis_limits_auto("x_axis")
+    dpg.set_axis_limits_auto("y_axis")
+
 
 ##############################################################################
 
@@ -85,6 +102,7 @@ def main():
             dpg.add_button(label="Get Active Channels", tag="get_active_channels", callback=set_active_channels)
         with dpg.group(tag="func_choose", show=False):
             dpg.add_button(label="Show Squiggle Plot", callback=choose_channel)
+            dpg.add_button(label="Show Density Plot", callback=show_kde)
 
         dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
 
@@ -103,7 +121,29 @@ def main():
             dpg.set_axis_limits(dpg.last_item(), -20, 350)
 
             # add series to y axis
-            dpg.add_line_series([], [], parent="y_axis", tag = "raw_series")
+            dpg.add_line_series([], [], parent=dpg.last_item(), tag = "raw_series")
+            # dpg.set_axis_limits_auto("x_axis")
+            # dpg.set_axis_limits_auto("y_axis")
+
+    with dpg.window(label="Kernel Density", width=800, height=600, show=False, tag="kde-data"):
+        #dpg.add_button(label="Show signal density", callback=show_kde)
+
+        with dpg.plot(label="Density Plot", height=-1, width=-1):
+            dpg.add_plot_legend()
+
+            # create x axis
+            dpg.add_plot_axis(dpg.mvXAxis, label="current [pA]", no_gridlines=True, tag="x_axis")
+            dpg.set_axis_limits(dpg.last_item(), -20, 350)
+            # dpg.set_axis_ticks(dpg.last_item(), (("S1", 11), ("S2", 21), ("S3", 31)))
+
+            # create y axis
+            dpg.add_plot_axis(dpg.mvYAxis, label="density", tag="y_axis")
+            dpg.set_axis_limits("y_axis", -0.05, 0.2)
+
+            # add series to y axis
+            dpg.add_line_series([], [], parent="y_axis", tag = "raw_density")
+            # dpg.set_axis_limits_auto("x_axis")
+            # dpg.set_axis_limits_auto("y_axis")
 
     dpg.create_viewport(title='NanoTrace', width=850, height=800)
     dpg.setup_dearpygui()
