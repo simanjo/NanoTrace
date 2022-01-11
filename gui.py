@@ -30,7 +30,8 @@ def set_active_channels():
 
     chans = _get_active_channels(fname)
     dpg.configure_item("channel", items=chans)
-
+    dpg.configure_item("get_active_channels", show=False)
+    dpg.configure_item("func_choose", show=True)
 
 
 def choose_file(sender, app_data, user_data):
@@ -41,7 +42,9 @@ def choose_file(sender, app_data, user_data):
         return
     dpg.set_value("file", fname)
     dpg.set_value("filepath", fpath)
+    dpg.configure_item("file", show=True)
     dpg.configure_item("channel", items=list(range(1,127)))
+    dpg.configure_item("channel_choose", show=True)
 
 
 
@@ -54,6 +57,7 @@ def choose_channel(sender, app_data, user_data):
     with BulkFast5(fname) as fh:
         raw_data = fh.get_raw(c)
 
+    dpg.configure_item("raw-data", show=True)
     dpg.set_value('raw_series', [list(range(0,len(raw_data))), raw_data])
     dpg.set_axis_limits_auto("raw_x_axis")
     dpg.set_axis_limits_auto("raw_y_axis")
@@ -75,16 +79,17 @@ def main():
         with dpg.group(horizontal=True):
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog"))
             dpg.add_text(tag="file", show=False)
-        with dpg.group(horizontal=True):
+        with dpg.group(horizontal=True, tag="channel_choose", show=False):
             dpg.add_text("Channel:")
             dpg.add_combo(tag="channel", width=60)
-            dpg.add_button(label="Get active channels", callback=set_active_channels)
-        with dpg.group(tag="func_choose"):
+            dpg.add_button(label="Get Active Channels", tag="get_active_channels", callback=set_active_channels)
+        with dpg.group(tag="func_choose", show=False):
             dpg.add_button(label="Show Squiggle Plot", callback=choose_channel)
 
         dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
 
-    with dpg.window(label="Raw Data", width=800, height=600, tag="raw-data"):
+
+    with dpg.window(label="Raw Data", width=800, height=600, show=False, tag="raw-data"):
         with dpg.plot(label="Squiggle Plot", height=-1, width=-1):
             dpg.add_plot_legend()
 
