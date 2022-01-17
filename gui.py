@@ -84,18 +84,19 @@ def show_kde(sender, app_data, user_data):
     dpg.set_axis_limits_auto("y_axis")
 
 
-##############################################################################
 
-def main():
-    dpg.create_context()
-
+################# Setup functions ############################################
+#TODO: build OO interface for sounder intialization
+def _add_file_dialog():
     with dpg.file_dialog(directory_selector=False, show=False, callback=choose_file, id="file_dialog", width=500, height=400):
         dpg.add_file_extension(".*")
         dpg.add_file_extension(".fast5", color=(0, 255, 255, 255), custom_text="[fast5]")
 
+def _init_value_registry():
     with dpg.value_registry():
         dpg.add_string_value(tag="filepath")
 
+def _add_command_central():
     with dpg.window(label="Command Central", autosize=True, no_close=True, no_collapse=True):
         with dpg.group(horizontal=True):
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog"))
@@ -110,6 +111,25 @@ def main():
 
         dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
 
+def _start_app():
+    dpg.bind_theme(custom_theme())
+
+    dpg.create_viewport(title='NanoTrace', width=850, height=800)
+    dpg.setup_dearpygui()
+
+    dpg.show_viewport()
+    dpg.start_dearpygui()
+
+
+##############################################################################
+
+def main():
+    dpg.create_context()
+
+    _add_file_dialog()
+    _add_command_central()
+
+    _init_value_registry()
 
     with dpg.window(label="Raw Data", width=800, height=600, show=False, tag="raw-data"):
         with dpg.plot(label="Squiggle Plot", height=-1, width=-1):
@@ -149,13 +169,8 @@ def main():
             # dpg.set_axis_limits_auto("x_axis")
             # dpg.set_axis_limits_auto("y_axis")
 
-    dpg.bind_theme(custom_theme())
+    _start_app()
 
-    dpg.create_viewport(title='NanoTrace', width=850, height=800)
-    dpg.setup_dearpygui()
-
-    dpg.show_viewport()
-    dpg.start_dearpygui()
     dpg.destroy_context()
 
 if __name__ == '__main__':
