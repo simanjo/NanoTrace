@@ -48,6 +48,8 @@ def choose_file(sender, app_data, user_data):
     dpg.configure_item("file", show=True)
     dpg.configure_item("channel", items=list(range(1,127)))
     dpg.configure_item("channel_choose", show=True)
+    dpg.configure_item("get_active_channels", show=True)
+    dpg.configure_item("func_choose", show=False)
 
 
 
