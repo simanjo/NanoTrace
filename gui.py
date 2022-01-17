@@ -89,7 +89,7 @@ def show_kde(sender, app_data, user_data):
 def main():
     dpg.create_context()
 
-    with dpg.file_dialog(directory_selector=False, show=False, callback=choose_file, id="file_dialog"):
+    with dpg.file_dialog(directory_selector=False, show=False, callback=choose_file, id="file_dialog", width=500, height=400):
         dpg.add_file_extension(".*")
         dpg.add_file_extension(".fast5", color=(0, 255, 255, 255), custom_text="[fast5]")
 
