@@ -1,0 +1,4 @@
+dearpygui
+numpy
+statsmodels
+-r fast5_research/requirements.txt
