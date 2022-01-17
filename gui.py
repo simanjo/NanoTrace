@@ -2,6 +2,8 @@ import dearpygui.dearpygui as dpg
 from fast5_research.fast5_bulk import BulkFast5
 import numpy as np
 import statsmodels.nonparametric.kde as kde
+from themes import custom_theme
+
 
 def _is_active_channel(fname, channel):
     with BulkFast5(fname) as fh:
@@ -144,6 +146,8 @@ def main():
             dpg.add_line_series([], [], parent="y_axis", tag = "raw_density")
             # dpg.set_axis_limits_auto("x_axis")
             # dpg.set_axis_limits_auto("y_axis")
+
+    dpg.bind_theme(custom_theme())
 
     dpg.create_viewport(title='NanoTrace', width=850, height=800)
     dpg.setup_dearpygui()
