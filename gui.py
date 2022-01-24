@@ -1,7 +1,7 @@
 import dearpygui.dearpygui as dpg
 from fast5_research.fast5_bulk import BulkFast5
 import numpy as np
-import statsmodels.nonparametric.kde as kde
+import statsmodels.api as sm
 from themes import custom_theme
 
 
@@ -77,7 +77,7 @@ def show_kde(sender, app_data, user_data):
         raw_data = fh.get_raw(c)
 
     dpg.configure_item("kde-data", show=True)
-    kdes = kde.KDEUnivariate(raw_data)
+    kdes = sm.nonparametric.KDEUnivariate(raw_data)
     kdes.fit()
     dpg.set_value('raw_density', [kdes.support, kdes.density])
     dpg.set_axis_limits_auto("x_axis")
