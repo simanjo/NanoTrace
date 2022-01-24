@@ -37,6 +37,8 @@ def _get_active_channels(fname, burnin=350000):
 
 def set_active_channels():
     global exp_df
+    # first thing to happen: button vanishes
+    dpg.configure_item("get_active_channels", show=False)
 
     fpath = dpg.get_value("filepath")
     burnin = 350000
@@ -47,7 +49,6 @@ def set_active_channels():
     fname = path.splitext(path.split(fpath)[1])[0]
     exp_df[fname]["active_channels"] = chans
     dpg.configure_item("channel", items=chans)
-    dpg.configure_item("get_active_channels", show=False)
     dpg.configure_item("func_choose", show=True)
     dpg.configure_item("toggle_channels", show=True)
 
@@ -60,17 +61,23 @@ def choose_file(sender, app_data, user_data):
         fname = path.splitext(list(app_data['selections'].keys())[0])[0]
     except KeyError:
         return
+
+
+    dpg.set_value("filename", fname)
+    dpg.set_value("filepath", fpath)
+    dpg.configure_item("filename", show=True)
+    dpg.configure_item("channel_choose", show=True)
+    dpg.set_value("channel", "")
+    dpg.configure_item("get_active_channels", show=False)
+    dpg.configure_item("toggle_channels", show=False)
+    dpg.configure_item("func_choose", show=False)
+
     if fname in exp_df.keys():
-        dpg.set_value("file", fname)
-        dpg.set_value("filepath", fpath)
-        dpg.configure_item("file", show=True)
         if "active_channels" in exp_df[fname].keys():
             dpg.configure_item("channel", items=exp_df[fname]['active_channels'])
+            dpg.configure_item("toggle_channels", show=True)
             dpg.configure_item("func_choose", show=True)
-        else:
-            dpg.configure_item("channel", items=list(range(1,127)))
-            dpg.configure_item("get_active_channels", show=True)
-            dpg.configure_item("func_choose", show=False)
+            return
     else:
         dpg.set_value("file", fname)
         dpg.set_value("filepath", fpath)
@@ -82,15 +89,19 @@ def choose_file(sender, app_data, user_data):
 
         exp_df[fname] = {'path':fpath, 'md5':md5(fpath)}
 
+    dpg.configure_item("channel", items=list(range(1,127)))
+    dpg.configure_item("get_active_channels", show=True)
+
 
 
 def choose_channel(sender, app_data, user_data):
     c = dpg.get_value("channel")
-    fname = dpg.get_value("filepath")
-    if not fname or not c:
+    fpath = dpg.get_value("filepath")
+    fname = dpg.get_value("filename")
+    if not fpath or not c:
         return
 
-    with BulkFast5(fname) as fh:
+    with BulkFast5(fpath) as fh:
         raw_data = fh.get_raw(c)
 
     dpg.configure_item("raw-data", show=True)
@@ -100,11 +111,12 @@ def choose_channel(sender, app_data, user_data):
 
 def show_kde(sender, app_data, user_data):
     c = dpg.get_value("channel")
-    fname = dpg.get_value("filepath")
-    if not fname or not c:
+    fpath = dpg.get_value("filepath")
+    fname = dpg.get_value("filename")
+    if not fpath or not c:
         return
 
-    with BulkFast5(fname) as fh:
+    with BulkFast5(fpath) as fh:
         raw_data = fh.get_raw(c)
 
     dpg.configure_item("kde-data", show=True)
@@ -119,7 +131,7 @@ def toggle_active_channels(sender, app_data, user_data):
     if(dpg.get_value(sender)):
         dpg.configure_item("channel", items=list(range(1,127)))
     else:
-        fname = dpg.get_value("file")
+        fname = dpg.get_value("filename")
         if fname in exp_df.keys() and 'active_channels' in exp_df[fname].keys():
             dpg.configure_item("channel", items=exp_df[fname]['active_channels'])
 
@@ -140,11 +152,11 @@ def _add_command_central():
     with dpg.window(label="Command Central", autosize=True, no_close=True, no_collapse=True):
         with dpg.group(horizontal=True):
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog"))
-            dpg.add_text(tag="file", show=False)
+            dpg.add_text(tag="filename", show=False)
         with dpg.group(horizontal=True, tag="channel_choose", show=False):
             dpg.add_text("Channel:")
             dpg.add_combo(tag="channel", width=60)
-            dpg.add_button(label="Get Active Channels", tag="get_active_channels", callback=set_active_channels)
+            dpg.add_button(label="Get Active Channels", tag="get_active_channels", callback=set_active_channels, show=False)
             dpg.add_checkbox(label="Show All Channels", tag='toggle_channels', callback=toggle_active_channels, show=False)
         with dpg.group(tag="func_choose", show=False):
             dpg.add_button(label="Show Squiggle Plot", callback=choose_channel)
