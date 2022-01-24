@@ -88,6 +88,23 @@ def choose_file(sender, app_data, user_data):
     dpg.configure_item("channel", items=list(range(1,127)))
     dpg.configure_item("get_active_channels", show=True)
 
+def _plot_raw_series(data, name, channel):
+    dpg.configure_item("raw_data_window", show=True)
+
+    with dpg.plot(label=f"{name}\nChannel {channel}", height=-1, width=-1, tag="raw_plot", parent="raw_data_window"):
+        dpg.add_plot_legend()
+
+        dpg.add_plot_axis(dpg.mvXAxis, label="index", tag="raw_x_axis")#, no_gridlines=True)
+        dpg.set_axis_limits(dpg.last_item(), 0, 100000)
+
+        dpg.add_plot_axis(dpg.mvYAxis, label="current [pA]", tag="raw_y_axis")
+        dpg.set_axis_limits(dpg.last_item(), -20, 350)
+
+        dpg.add_line_series(list(range(0,len(data))), data, parent=dpg.last_item())
+        dpg.set_axis_limits_auto("raw_x_axis")
+        dpg.set_axis_limits_auto("raw_y_axis")
+
+    dpg.configure_item("raw_data_window", on_close=lambda:dpg.delete_item("raw_plot"))
 
 
 def choose_channel(sender, app_data, user_data):
@@ -100,27 +117,42 @@ def choose_channel(sender, app_data, user_data):
     with BulkFast5(fpath) as fh:
         raw_data = fh.get_raw(c)
 
-    dpg.configure_item("raw-data", show=True)
-    dpg.set_value('raw_series', [list(range(0,len(raw_data))), raw_data])
-    dpg.set_axis_limits_auto("raw_x_axis")
-    dpg.set_axis_limits_auto("raw_y_axis")
+    _plot_raw_series(raw_data, fname, c)
+
+
+def _plot_kde(title, *data):
+    dpg.configure_item("kde_window", show=True)
+
+    with dpg.plot(label=title, height=-1, width=-1, tag="kde_plot", parent="kde_window"):
+        dpg.add_plot_legend()
+
+        dpg.add_plot_axis(dpg.mvXAxis, label="current [pA]", tag="kde_x_axis")#, no_gridlines=True)
+        dpg.set_axis_limits(dpg.last_item(), -20, 350)
+
+        dpg.add_plot_axis(dpg.mvYAxis, label="density", tag="kde_y_axis")
+        dpg.set_axis_limits(dpg.last_item(), -0.05, 0.2)
+
+        for kde in data:
+            dpg.add_line_series(kde.support, kde.density, parent="kde_y_axis")
+        dpg.set_axis_limits_auto("kde_x_axis")
+        dpg.set_axis_limits_auto("kde_y_axis")
+
+    dpg.configure_item("kde_window", on_close=lambda:dpg.delete_item("kde_plot"))
 
 def show_kde(sender, app_data, user_data):
     c = dpg.get_value("channel")
     fpath = dpg.get_value("filepath")
     fname = dpg.get_value("filename")
+    title = f"{fname}\nChannel {c}"
     if not fpath or not c:
         return
 
     with BulkFast5(fpath) as fh:
         raw_data = fh.get_raw(c)
 
-    dpg.configure_item("kde-data", show=True)
-    kdes = sm.nonparametric.KDEUnivariate(raw_data)
-    kdes.fit()
-    dpg.set_value('raw_density', [kdes.support, kdes.density])
-    dpg.set_axis_limits_auto("x_axis")
-    dpg.set_axis_limits_auto("y_axis")
+    kde = sm.nonparametric.KDEUnivariate(raw_data)
+    kde.fit(gridsize=min(1000000,len(raw_data)))
+    _plot_kde(title, kde)
 
 def toggle_active_channels(sender, app_data, user_data):
     global exp_df
@@ -160,6 +192,14 @@ def _add_command_central():
 
         dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
 
+
+def _add_raw_data_window():
+    dpg.add_window(label="Raw Data", width=800, height=600, show=False, tag="raw_data_window")
+
+def _add_kde_window():
+    dpg.add_window(label="Kernel Density", width=800, height=600, show=False, tag="kde_window")
+
+
 def _start_app():
     dpg.bind_theme(custom_theme())
 
@@ -175,50 +215,15 @@ def _start_app():
 def main():
     global exp_df
     exp_df = {}
+
     dpg.create_context()
 
     _add_file_dialog()
     _add_command_central()
+    _add_raw_data_window()
+    _add_kde_window()
 
     _init_value_registry()
-
-    with dpg.window(label="Raw Data", width=800, height=600, show=False, tag="raw-data"):
-        with dpg.plot(label="Squiggle Plot", height=-1, width=-1):
-            dpg.add_plot_legend()
-
-            # create x axis
-            dpg.add_plot_axis(dpg.mvXAxis, label="index", no_gridlines=True, tag="raw_x_axis")
-            dpg.set_axis_limits(dpg.last_item(), 0, 100000)
-            # dpg.set_axis_ticks(dpg.last_item(), (("S1", 11), ("S2", 21), ("S3", 31)))
-
-            # create y axis
-            dpg.add_plot_axis(dpg.mvYAxis, label="current [pA]", tag="raw_y_axis")
-            dpg.set_axis_limits(dpg.last_item(), -20, 350)
-
-            # add series to y axis
-            dpg.add_line_series([], [], parent=dpg.last_item(), tag = "raw_series")
-            # dpg.set_axis_limits_auto("x_axis")
-            # dpg.set_axis_limits_auto("y_axis")
-
-    with dpg.window(label="Kernel Density", width=800, height=600, show=False, tag="kde-data"):
-        #dpg.add_button(label="Show signal density", callback=show_kde)
-
-        with dpg.plot(label="Density Plot", height=-1, width=-1):
-            dpg.add_plot_legend()
-
-            # create x axis
-            dpg.add_plot_axis(dpg.mvXAxis, label="current [pA]", no_gridlines=True, tag="x_axis")
-            dpg.set_axis_limits(dpg.last_item(), -20, 350)
-            # dpg.set_axis_ticks(dpg.last_item(), (("S1", 11), ("S2", 21), ("S3", 31)))
-
-            # create y axis
-            dpg.add_plot_axis(dpg.mvYAxis, label="density", tag="y_axis")
-            dpg.set_axis_limits("y_axis", -0.05, 0.2)
-
-            # add series to y axis
-            dpg.add_line_series([], [], parent="y_axis", tag = "raw_density")
-            # dpg.set_axis_limits_auto("x_axis")
-            # dpg.set_axis_limits_auto("y_axis")
 
     _start_app()
 
