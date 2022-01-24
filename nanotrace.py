@@ -49,6 +49,7 @@ def set_active_channels():
     dpg.configure_item("channel", items=chans)
     dpg.configure_item("get_active_channels", show=False)
     dpg.configure_item("func_choose", show=True)
+    dpg.configure_item("toggle_channels", show=True)
 
 
 def choose_file(sender, app_data, user_data):
@@ -113,6 +114,15 @@ def show_kde(sender, app_data, user_data):
     dpg.set_axis_limits_auto("x_axis")
     dpg.set_axis_limits_auto("y_axis")
 
+def toggle_active_channels(sender, app_data, user_data):
+    global exp_df
+    if(dpg.get_value(sender)):
+        dpg.configure_item("channel", items=list(range(1,127)))
+    else:
+        fname = dpg.get_value("file")
+        if fname in exp_df.keys() and 'active_channels' in exp_df[fname].keys():
+            dpg.configure_item("channel", items=exp_df[fname]['active_channels'])
+
 
 
 ################# Setup functions ############################################
@@ -135,6 +145,7 @@ def _add_command_central():
             dpg.add_text("Channel:")
             dpg.add_combo(tag="channel", width=60)
             dpg.add_button(label="Get Active Channels", tag="get_active_channels", callback=set_active_channels)
+            dpg.add_checkbox(label="Show All Channels", tag='toggle_channels', callback=toggle_active_channels, show=False)
         with dpg.group(tag="func_choose", show=False):
             dpg.add_button(label="Show Squiggle Plot", callback=choose_channel)
             dpg.add_button(label="Show Density Plot", callback=show_kde)
