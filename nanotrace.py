@@ -22,7 +22,7 @@ def md5(fname):
 
 def _update_channel_progress(channel):
     dpg.set_value("Progress Bar", (channel-1)/126)
-    dpg.configure_item("Progress Bar", overlay=f"Checking channel {channel}/126")
+    dpg.configure_item("Progress Bar", overlay=f"Checking channel {channel}/126", width=175)
     return True
 
 def _get_active_channels(fname, burnin=350000):
@@ -79,15 +79,11 @@ def choose_file(sender, app_data, user_data):
             dpg.configure_item("func_choose", show=True)
             return
     else:
-        dpg.set_value("file", fname)
-        dpg.set_value("filepath", fpath)
-        dpg.configure_item("file", show=True)
-        dpg.configure_item("channel", items=list(range(1,127)))
-        dpg.configure_item("channel_choose", show=True)
-        dpg.configure_item("get_active_channels", show=True)
-        dpg.configure_item("func_choose", show=False)
-
+        dpg.configure_item("Progress Bar", show=True)
+        dpg.set_value("Progress Bar", 0.5)
+        dpg.configure_item("Progress Bar", overlay=f"Calculating file hash", width=150)
         exp_df[fname] = {'path':fpath, 'md5':md5(fpath)}
+        dpg.configure_item("Progress Bar", show=False)
 
     dpg.configure_item("channel", items=list(range(1,127)))
     dpg.configure_item("get_active_channels", show=True)
