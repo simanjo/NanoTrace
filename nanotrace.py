@@ -5,6 +5,7 @@ import statsmodels.api as sm
 from themes import custom_theme
 from os import path
 import hashlib
+import random
 
 
 def _is_active_channel(fname, channel, burnin):
@@ -163,6 +164,31 @@ def toggle_active_channels(sender, app_data, user_data):
         if fname in exp_df.keys() and 'active_channels' in exp_df[fname].keys():
             dpg.configure_item("channel", items=exp_df[fname]['active_channels'])
 
+def show_rand_kde(sender, app_data, user_data):
+    fpath = dpg.get_value("filepath")
+    fname = dpg.get_value("filename")
+    if fname in exp_df.keys() and 'active_channels' in exp_df[fname].keys():
+        active_chans = exp_df[fname]['active_channels']
+    if not fpath or not active_chans:
+        return
+
+    chans = random.choices(active_chans, k=10) if len(active_chans) > 11 else active_chans
+    title = f"{fname}\nChannel {chans}"
+
+    dpg.configure_item("Progress Bar", show=True, width=175)
+    kdes = []
+    count = 0
+    for c in chans:
+        dpg.set_value("Progress Bar", count/len(chans))
+        dpg.configure_item("Progress Bar", overlay=f"Calculating KDE {count+1}/{len(chans)}")
+        with BulkFast5(fpath) as fh:
+            raw_data = fh.get_raw(c)
+        kde = sm.nonparametric.KDEUnivariate(raw_data)
+        kde.fit(gridsize=min(1000000,len(raw_data)))
+        kdes.append(kde)
+        count += 1
+    dpg.configure_item("Progress Bar", show=False)
+    _plot_kde(title, *kdes)
 
 
 ################# Setup functions ############################################
@@ -189,6 +215,7 @@ def _add_command_central():
         with dpg.group(tag="func_choose", show=False):
             dpg.add_button(label="Show Squiggle Plot", callback=choose_channel)
             dpg.add_button(label="Show Density Plot", callback=show_kde)
+            dpg.add_button(label="Show Random Densities", callback=show_rand_kde)
 
         dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
 
