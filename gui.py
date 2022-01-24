@@ -5,9 +5,9 @@ import statsmodels.nonparametric.kde as kde
 from themes import custom_theme
 
 
-def _is_active_channel(fname, channel):
+def _is_active_channel(fname, channel, burnin):
     with BulkFast5(fname) as fh:
-        raw_data = fh.get_raw(channel)
+        raw_data = fh.get_raw(channel)[burnin:]
 
     return np.abs(np.mean(raw_data)) > 1 and len(raw_data[np.logical_and(raw_data > 150, raw_data < 350)]) > 0
 
@@ -16,22 +16,22 @@ def _update_channel_progress(channel):
     dpg.configure_item("Progress Bar", overlay=f"Checking channel {channel}/126")
     return True
 
-def _get_active_channels(fname):
+def _get_active_channels(fname, burnin=350000):
     dpg.configure_item("Progress Bar", show=True)
 
     result = [
-        c for c in range(1,127) if _update_channel_progress(c) and _is_active_channel(fname, c)
+        c for c in range(1,127) if _update_channel_progress(c) and _is_active_channel(fname, c, burnin)
     ]
 
     dpg.configure_item("Progress Bar", show=False)
     return result
 
 def set_active_channels():
-    fname = dpg.get_value("filepath")
-    if not fname:
+
+    burnin = 350000
         return
 
-    chans = _get_active_channels(fname)
+    chans = _get_active_channels(fpath, burnin)
     dpg.configure_item("channel", items=chans)
     dpg.configure_item("get_active_channels", show=False)
     dpg.configure_item("func_choose", show=True)
