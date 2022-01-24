@@ -3,6 +3,8 @@ from fast5_research.fast5_bulk import BulkFast5
 import numpy as np
 import statsmodels.api as sm
 from themes import custom_theme
+from os import path
+import hashlib
 
 
 def _is_active_channel(fname, channel, burnin):
@@ -10,6 +12,13 @@ def _is_active_channel(fname, channel, burnin):
         raw_data = fh.get_raw(channel)[burnin:]
 
     return np.abs(np.mean(raw_data)) > 1 and len(raw_data[np.logical_and(raw_data > 150, raw_data < 350)]) > 0
+
+def md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 def _update_channel_progress(channel):
     dpg.set_value("Progress Bar", (channel-1)/126)
@@ -27,29 +36,50 @@ def _get_active_channels(fname, burnin=350000):
     return result
 
 def set_active_channels():
+    global exp_df
 
+    fpath = dpg.get_value("filepath")
     burnin = 350000
+    if not fpath:
         return
 
     chans = _get_active_channels(fpath, burnin)
+    fname = path.splitext(path.split(fpath)[1])[0]
+    exp_df[fname]["active_channels"] = chans
     dpg.configure_item("channel", items=chans)
     dpg.configure_item("get_active_channels", show=False)
     dpg.configure_item("func_choose", show=True)
 
 
 def choose_file(sender, app_data, user_data):
+    global exp_df
+
     try:
         fpath = list(app_data['selections'].values())[0]
-        fname = list(app_data['selections'].keys())[0]
+        fname = path.splitext(list(app_data['selections'].keys())[0])[0]
     except KeyError:
         return
-    dpg.set_value("file", fname)
-    dpg.set_value("filepath", fpath)
-    dpg.configure_item("file", show=True)
-    dpg.configure_item("channel", items=list(range(1,127)))
-    dpg.configure_item("channel_choose", show=True)
-    dpg.configure_item("get_active_channels", show=True)
-    dpg.configure_item("func_choose", show=False)
+    if fname in exp_df.keys():
+        dpg.set_value("file", fname)
+        dpg.set_value("filepath", fpath)
+        dpg.configure_item("file", show=True)
+        if "active_channels" in exp_df[fname].keys():
+            dpg.configure_item("channel", items=exp_df[fname]['active_channels'])
+            dpg.configure_item("func_choose", show=True)
+        else:
+            dpg.configure_item("channel", items=list(range(1,127)))
+            dpg.configure_item("get_active_channels", show=True)
+            dpg.configure_item("func_choose", show=False)
+    else:
+        dpg.set_value("file", fname)
+        dpg.set_value("filepath", fpath)
+        dpg.configure_item("file", show=True)
+        dpg.configure_item("channel", items=list(range(1,127)))
+        dpg.configure_item("channel_choose", show=True)
+        dpg.configure_item("get_active_channels", show=True)
+        dpg.configure_item("func_choose", show=False)
+
+        exp_df[fname] = {'path':fpath, 'md5':md5(fpath)}
 
 
 
@@ -124,6 +154,8 @@ def _start_app():
 ##############################################################################
 
 def main():
+    global exp_df
+    exp_df = {}
     dpg.create_context()
 
     _add_file_dialog()
