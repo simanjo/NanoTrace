@@ -27,7 +27,8 @@ def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
 
     # TODO/HACK: invent state interface to allow for
     #            easier switching of displayed stuff
-    context.update_context(fpath, progressbar="Progress Bar")
+    context.update_context(fpath, progressbar="Progress Bar", table="exp_table")
+    dpg.configure_item("experiment_tab", show=True)
     dpg.set_value("filename", context.active_exp.name)
     dpg.configure_item("filename", show=True)
     dpg.configure_item("channel_choose", show=True)
@@ -79,6 +80,13 @@ def _add_command_central():
                     dpg.add_button(label="Show Random Densities", callback=show_rand_kde, user_data=context)
 
                 dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
+            with dpg.tab(label="Experiments", show=False, tag="experiment_tab"):
+                with dpg.table(header_row=True, resizable=True, tag="exp_table"):
+                    dpg.add_table_column(label="Name")
+                    dpg.add_table_column(label="Filepath(s)")
+                    dpg.add_table_column(label="Analyte")
+                    dpg.add_table_column(label="Concentration")
+                    dpg.add_table_column(label="# channels")
 
 
 def _start_app():
