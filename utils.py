@@ -32,3 +32,55 @@ def get_active_channels(fname: int, burnin: int = 350000) -> bool:
 
     dpg.configure_item("Progress Bar", show=False)
     return result
+
+def parse_exp_name(name):
+    properties = dict()
+
+    # try to guess concentration from name if that fails
+    # for whatever reaseon, concentration is NaN
+    conc = np.nan
+    try:
+        match = re.search(
+            '\D*(?P<conc>\d*\.?\d*)(?P<exp>mikro|nm|nano)',
+            name.lower()
+        )
+        if match is None:
+            print(f"Couldn't determine concentration for {name}")
+            conc = np.nan
+        else:
+            concentration = float(match.group('conc'))
+            expo = 1000 if match.group('exp') == "mikro" else 1
+            conc = int(concentration*expo)
+    except:
+        print(f"Couldn't determine concentration for {name}")
+        print(f"Having {match}")
+    finally:
+        properties["concentration"] = conc
+    
+    if "ochratoxin" in name.lower():
+        properties["hplc"] = False
+        properties["special_run"] = False
+        properties["buffer"] = False
+        return properties
+
+    if "buffer" in name.lower():
+        properties["buffer"] = True
+        properties["hplc"] = False
+        properties["special_run"] = False
+        properties["concentration"] = 0
+        return properties
+    else:
+        properties["buffer"] = False
+
+    if "hplc" in name.lower():
+        properties["hplc"] = True
+    else:
+        properties["hplc"] = False
+
+    special_names = ["glycerol", "polya", "150mv", "denatured", "strepdavidin"]
+    if any(part in name.lower() for part in special_names):
+        properties["special_run"] = True
+    else:
+        properties["special_run"] = False
+
+    return properties
