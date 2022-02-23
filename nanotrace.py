@@ -62,22 +62,23 @@ def _add_file_dialog():
 
 def _add_command_central():
     global context
-    with dpg.window(label="Command Central", autosize=True, no_close=True, no_collapse=True):
-        with dpg.group(horizontal=True):
-            dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog"))
-            dpg.add_text(tag="filename", show=False)
-        with dpg.group(horizontal=True, tag="channel_choose", show=False):
-            dpg.add_text("Channel:")
-            dpg.add_combo(tag="channel", width=60)
-            dpg.add_button(label="Get Active Channels", tag="get_active_channels", callback=set_active_channels, show=False)
-            dpg.add_checkbox(label="Show All Channels", tag='toggle_channels', callback=toggle_active_channels, show=False)
-        with dpg.group(tag="func_choose", show=False):
-            dpg.add_button(label="Show Squiggle Plot", callback=show_raw, user_data=context)
-            dpg.add_button(label="Show Density Plot", callback=show_kde, user_data=context)
-            dpg.add_button(label="Show Random Densities", callback=show_rand_kde, user_data=context)
+    with dpg.window(tag="main_window", autosize=True, no_close=True, no_collapse=True):
+        with dpg.tab_bar():
+            with dpg.tab(label="Command Central"):
+                with dpg.group(horizontal=True):
+                    dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog"))
+                    dpg.add_text(tag="filename", show=False)
+                with dpg.group(horizontal=True, tag="channel_choose", show=False):
+                    dpg.add_text("Channel:")
+                    dpg.add_combo(tag="channel", width=60)
+                    dpg.add_button(label="Get Active Channels", tag="get_active_channels", callback=set_active_channels, show=False)
+                    dpg.add_checkbox(label="Show All Channels", tag='toggle_channels', callback=toggle_active_channels, show=False)
+                with dpg.group(tag="func_choose", show=False):
+                    dpg.add_button(label="Show Squiggle Plot", callback=show_raw, user_data=context)
+                    dpg.add_button(label="Show Density Plot", callback=show_kde, user_data=context)
+                    dpg.add_button(label="Show Random Densities", callback=show_rand_kde, user_data=context)
 
-        dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
-
+                dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
 
 
 def _start_app():
@@ -87,6 +88,7 @@ def _start_app():
     dpg.setup_dearpygui()
 
     dpg.show_viewport()
+    dpg.set_primary_window("main_window", True)
     dpg.start_dearpygui()
 
 
