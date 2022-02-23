@@ -8,11 +8,6 @@ import hashlib
 import random
 
 
-def _is_active_channel(fname, channel, burnin):
-    with BulkFast5(fname) as fh:
-        raw_data = fh.get_raw(channel)[burnin:]
-
-    return np.abs(np.mean(raw_data)) > 1 and len(raw_data[np.logical_and(raw_data > 150, raw_data < 350)]) > 0
 
 def md5(fname):
     hash_md5 = hashlib.md5()
@@ -20,21 +15,6 @@ def md5(fname):
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
-
-def _update_channel_progress(channel):
-    dpg.set_value("Progress Bar", (channel-1)/126)
-    dpg.configure_item("Progress Bar", overlay=f"Checking channel {channel}/126", width=175)
-    return True
-
-def _get_active_channels(fname, burnin=350000):
-    dpg.configure_item("Progress Bar", show=True)
-
-    result = [
-        c for c in range(1,127) if _update_channel_progress(c) and _is_active_channel(fname, c, burnin)
-    ]
-
-    dpg.configure_item("Progress Bar", show=False)
-    return result
 
 def set_active_channels():
     global exp_df
