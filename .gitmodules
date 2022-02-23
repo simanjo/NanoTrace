@@ -2,3 +2,6 @@
 	path = fast5_research
 	url = https://github.com/simanjo/fast5_research.git
 	branch = bulkfiles
+[submodule "python_toolbox"]
+	path = python_toolbox
+	url = https://github.com/simanjo/python_toolbox.git
