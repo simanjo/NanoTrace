@@ -1,11 +1,6 @@
 import dearpygui.dearpygui as dpg
-from fast5_research.fast5_bulk import BulkFast5
-import numpy as np
-import statsmodels.api as sm
 from themes import custom_theme
 from os import path
-import hashlib
-import random
 
 from series_plots import show_kde, show_rand_kde, show_raw
 from Context import Context
