@@ -28,35 +28,25 @@ class SeriesData:
 
 
 def _plot_series(target: DpgItem, data: SeriesData) -> None:
-    dpg.configure_item(target, show=True)
-
-    with dpg.plot(label=data.title, height=-1, width=-1, parent=target):
-        dpg.add_plot_legend()
-
-        dpg.add_plot_axis(dpg.mvXAxis, label=data.x_label)
-        x_axis = dpg.last_item()
+    with dpg.plot(label=data.title, height=-1, width=-1, parent=target) as plt:
+        x_axis = dpg.add_plot_axis(dpg.mvXAxis, label=data.x_label)
+        y_axis = dpg.add_plot_axis(dpg.mvYAxis, label=data.y_label)
         dpg.set_axis_limits(x_axis, *data.x_lims)
-
-        dpg.add_plot_axis(dpg.mvYAxis, label=data.y_label)
-        y_axis = dpg.last_item()
         dpg.set_axis_limits(y_axis, *data.y_lims)
 
         for x_data, y_data in zip(data.x_datas, data.y_datas):
             dpg.add_line_series(x_data, y_data, parent=y_axis)
         dpg.set_axis_limits_auto(x_axis)
         dpg.set_axis_limits_auto(y_axis)
+    dpg.configure_item(target, on_close=lambda:dpg.delete_item(plt))
 
-    # get a reference to the current plot, as we might have
-    # a different last_item on calltime?
-    plot = dpg.last_item()
-    dpg.configure_item(target, on_close=lambda:dpg.delete_item(plot))
 
 def _get_kdes(context: Context, *chans) -> List[sm.nonparametric.KDEUnivariate]:
     fpath = context.active_exp.fpath
     burnin = context.settings['burnin']
     kde_resolution = context.settings['kde_resolution']
 
-    progress_bar = context.get_progress_bar()
+    progress_bar = "Progress Bar" #context.get_progress_bar()
     dpg.configure_item(progress_bar, show=True, width=175)
     kdes = []
     for count, chan in enumerate(chans):
