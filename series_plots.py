@@ -15,16 +15,14 @@ DpgItem = Union[int, str]
 # int is ok where float is required
 @dataclass
 class SeriesData:
-    # TODO/HACK: Union[Collection, Collection[Collection]] mimicks
-    # *arg syntax to allow for undecided many plots to be added
     # implicitly assert len(x_datas) == len(y_datas)
     title: str
     x_label: str
     x_lims: Sequence[float]
-    x_datas: Union[Collection[float], Collection[Collection[float]]]
+    x_datas: List[Collection[float]]
     y_label: str
     y_lims: Sequence[float]
-    y_datas: Union[Collection[float], Collection[Collection[float]]]
+    y_datas: List[Collection[float]]
 
 
 def _plot_series(target: DpgItem, data: SeriesData) -> None:
@@ -40,18 +38,22 @@ def _plot_series(target: DpgItem, data: SeriesData) -> None:
         dpg.set_axis_limits_auto(y_axis)
     dpg.configure_item(target, on_close=lambda:dpg.delete_item(plt))
 
-
-def _get_kdes(context: Context, *chans) -> List[sm.nonparametric.KDEUnivariate]:
-    fpath = context.active_exp.fpath
+def _get_kdes(
+    context: Context, channels: List[int]
+) -> List[sm.nonparametric.KDEUnivariate]:
+    fpath = context.active_exp.path
     burnin = context.settings['burnin']
     kde_resolution = context.settings['kde_resolution']
 
     progress_bar = "Progress Bar" #context.get_progress_bar()
     dpg.configure_item(progress_bar, show=True, width=175)
     kdes = []
-    for count, chan in enumerate(chans):
-        dpg.set_value(progress_bar, count/len(chans))
-        dpg.configure_item(progress_bar, overlay=f"Calculating KDE {count+1}/{len(chans)}")
+    for count, chan in enumerate(channels):
+        dpg.set_value(progress_bar, count/len(channels))
+        dpg.configure_item(
+            progress_bar,
+            overlay=f"Calculating KDE {count+1}/{len(channels)}"
+        )
 
         with BulkFast5(fpath) as fh:
             raw_data = fh.get_raw(chan)[burnin:]
@@ -64,7 +66,7 @@ def _get_kdes(context: Context, *chans) -> List[sm.nonparametric.KDEUnivariate]:
 def _get_series_data(
     context: Context,
     flavour: Literal['raw', 'dens'],
-    *channels: int
+    channels: List[int]
 ) -> SeriesData:
     fpath = context.active_exp.path
     channel_id = channels[0] if len(channels) == 1 else channels
@@ -74,12 +76,12 @@ def _get_series_data(
         # assert len(channels) == 1
         channel = channels[0]
         with BulkFast5(fpath) as fh:
-            x_data = fh.get_raw(channel)
+            x_data = [fh.get_raw(channel)]
         x_label = "index"
         x_lims = (0, 100_000)
         y_label = "current [pA]"
         y_lims = (-20, 350)
-        y_data = list(range(0,len(x_data)))
+        y_data = [list(range(0,len(x_data[0])))]
     elif flavour == 'dens':
         kdes = _get_kdes(context, channels)
         x_data = [kde.support for kde in kdes]
@@ -101,7 +103,7 @@ def show_raw(
     if not (channel := dpg.get_value("channel")):
         # no channel set, fail silently, TODO: add handling ie message?
         return
-    series_data = _get_series_data(user_data, channel, "raw")
+    series_data = _get_series_data(user_data, "raw", [channel])
     target = dpg.add_window(label="Raw Data", width=800, height=600)
     _plot_series(target, series_data)
 
@@ -113,7 +115,7 @@ def show_kde(
     if not (channel := dpg.get_value("channel")):
         # no channel set, fail silently, TODO: add handling ie message?
         return
-    series_data = _get_series_data(user_data, channel, "dens")
+    series_data = _get_series_data(user_data, "dens", [channel])
     target = dpg.add_window(label="Kernel Density", width=800, height=600)
     _plot_series(target, series_data)
 
@@ -130,6 +132,6 @@ def show_rand_kde(
     else:
         chans = active_chans
 
-    series_data = _get_series_data(user_data, chans, "dens")
+    series_data = _get_series_data(user_data, "dens", chans)
     target = dpg.add_window(label="Kernel Density", width=800, height=600)
     _plot_series(target, series_data)
