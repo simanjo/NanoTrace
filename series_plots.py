@@ -56,9 +56,10 @@ def _get_kdes(context: Context, *chans) -> List[sm.nonparametric.KDEUnivariate]:
         with BulkFast5(fpath) as fh:
             raw_data = fh.get_raw(chan)[burnin:]
         kde = sm.nonparametric.KDEUnivariate(raw_data)
-        kde.fit(gridsize=min(kde_resolution,len(raw_data)))
+        kde.fit(gridsize=min(kde_resolution, len(raw_data)))
         kdes.append(kde)
     dpg.configure_item(progress_bar, show=False)
+    return kdes
 
 def _get_series_data(
     context: Context,
@@ -85,6 +86,7 @@ def _get_series_data(
         y_label = "density"
         y_lims = (-0.05, 0.2)
     else:
+        #TODO: find suitable error handling
         raise ArgumentError(f"Flavour {flavour} is no valid series flavour. Use \'raw\' or \'dens\'")
     return SeriesData(title, x_label, x_lims, x_data, y_label, y_lims, y_data)
 
