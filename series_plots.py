@@ -67,11 +67,14 @@ def _get_series_data(
     *channels: int
 ) -> SeriesData:
     fpath = context.active_exp.path
-    title = f"{context.active_exp.name}\nChannel {channels}"
+    channel_id = channels[0] if len(channels) == 1 else channels
+    title = f"{context.active_exp.name}\nChannel {channel_id}"
     if flavour == "raw":
         # TODO: ensure that channels fits as type?
+        # assert len(channels) == 1
+        channel = channels[0]
         with BulkFast5(fpath) as fh:
-            x_data = fh.get_raw(channels)
+            x_data = fh.get_raw(channel)
         x_label = "index"
         x_lims = (0, 100_000)
         y_label = "current [pA]"
@@ -99,8 +102,7 @@ def show_raw(
         # no channel set, fail silently, TODO: add handling ie message?
         return
     series_data = _get_series_data(user_data, channel, "raw")
-    dpg.add_window(label="Raw Data", width=800, height=600, show=False)
-    target = dpg.last_item()
+    target = dpg.add_window(label="Raw Data", width=800, height=600)
     _plot_series(target, series_data)
 
 def show_kde(
@@ -112,8 +114,7 @@ def show_kde(
         # no channel set, fail silently, TODO: add handling ie message?
         return
     series_data = _get_series_data(user_data, channel, "dens")
-    dpg.add_window(label="Kernel Density", width=800, height=600, show=False)
-    target = dpg.last_item()
+    target = dpg.add_window(label="Kernel Density", width=800, height=600)
     _plot_series(target, series_data)
 
 def show_rand_kde(
@@ -130,6 +131,5 @@ def show_rand_kde(
         chans = active_chans
 
     series_data = _get_series_data(user_data, chans, "dens")
-    dpg.add_window(label="Kernel Density", width=800, height=600, show=False)
-    target = dpg.last_item()
+    target = dpg.add_window(label="Kernel Density", width=800, height=600)
     _plot_series(target, series_data)
