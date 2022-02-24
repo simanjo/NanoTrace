@@ -76,12 +76,12 @@ def _get_series_data(
         # assert len(channels) == 1
         channel = channels[0]
         with BulkFast5(fpath) as fh:
-            x_data = [fh.get_raw(channel)]
+            y_data = [fh.get_raw(channel)]
         x_label = "index"
         x_lims = (0, 100_000)
         y_label = "current [pA]"
         y_lims = (-20, 350)
-        y_data = [list(range(0,len(x_data[0])))]
+        x_data = [list(range(0,len(y_data[0])))]
     elif flavour == 'dens':
         kdes = _get_kdes(context, channels)
         x_data = [kde.support for kde in kdes]
