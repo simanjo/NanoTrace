@@ -4,7 +4,7 @@ from themes import custom_theme
 from os import path
 
 from series_plots import show_kde, show_rand_kde, show_raw
-from Context import Context
+from context import Context
 
 DpgItem = Union[int, str]
 
