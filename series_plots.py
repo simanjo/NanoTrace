@@ -53,7 +53,7 @@ def _plot_series(target: DpgItem, data: SeriesData) -> None:
 
 def _get_kdes(context: Context, *chans) -> List[sm.nonparametric.KDEUnivariate]:
     fpath = context.active_exp.fpath
-    burnin = context.get_burnin()
+    burnin = context.settings['burnin']
     kde_resolution = context.settings['kde_resolution']
 
     progress_bar = context.get_progress_bar()

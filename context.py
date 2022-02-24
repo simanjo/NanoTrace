@@ -61,8 +61,6 @@ class Context:
             exp = self.exps[hash]
         self.active_exp = exp
 
-    def get_burnin() -> int:
-        return DEFAULT_SETTINGS['burnin']
 
     def get_active_channels(self) -> List[int]:
         if (chans := self.active_exp.active_channels) is None:
