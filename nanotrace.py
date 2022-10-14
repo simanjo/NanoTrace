@@ -29,7 +29,9 @@ def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
 
     # TODO/HACK: invent state interface to allow for
     #            easier switching of displayed stuff
-    context.update_context(fpath, progressbar="Progress Bar", table="exp_table")
+    context.update_context(
+        fpath, progressbar="Progress Bar", table="exp_table"
+    )
     dpg.configure_item("experiment_tab", show=True)
     dpg.set_value("filename", context.active_exp.name)
     dpg.configure_item("filename", show=True)
@@ -60,32 +62,62 @@ def toggle_active_channels(sender: DpgItem) -> None:
 ################# Setup functions ############################################
 #TODO: build OO interface for sounder intialization
 def _add_file_dialog():
-    with dpg.file_dialog(directory_selector=False, show=False, callback=choose_file, id="file_dialog", width=500, height=400):
+    with dpg.file_dialog(
+        directory_selector=False, show=False, callback=choose_file,
+        id="file_dialog", width=500, height=400
+    ):
         dpg.add_file_extension(".*")
-        dpg.add_file_extension(".fast5", color=(0, 255, 255, 255), custom_text="[fast5]")
+        dpg.add_file_extension(
+            ".fast5", color=(0, 255, 255, 255), custom_text="[fast5]"
+        )
 
 
 def _add_command_central():
     global context
-    with dpg.window(tag="main_window", autosize=True, no_close=True, no_collapse=True):
+    with dpg.window(
+        tag="main_window", autosize=True,
+        no_close=True, no_collapse=True
+    ):
         with dpg.tab_bar():
             with dpg.tab(label="Command Central"):
                 with dpg.group(horizontal=True):
-                    dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog"))
+                    dpg.add_button(
+                        label="File Selector",
+                        callback=lambda: dpg.show_item("file_dialog")
+                    )
                     dpg.add_text(tag="filename", show=False)
-                with dpg.group(horizontal=True, tag="channel_choose", show=False):
+                with dpg.group(
+                    horizontal=True, tag="channel_choose", show=False
+                ):
                     dpg.add_text("Channel:")
                     dpg.add_combo(tag="channel", width=60)
-                    dpg.add_button(label="Get Active Channels", tag="get_active_channels", callback=set_active_channels, show=False)
-                    dpg.add_checkbox(label="Show All Channels", tag='toggle_channels', callback=toggle_active_channels, show=False)
+                    dpg.add_button(
+                        label="Get Active Channels",
+                        tag="get_active_channels",
+                        callback=set_active_channels, show=False
+                    )
+                    dpg.add_checkbox(
+                        label="Show All Channels",
+                        tag='toggle_channels',
+                        callback=toggle_active_channels, show=False
+                    )
                 with dpg.group(tag="func_choose", show=False):
-                    dpg.add_button(label="Show Squiggle Plot", callback=show_raw, user_data=context)
-                    dpg.add_button(label="Show Density Plot", callback=show_kde, user_data=context)
-                    dpg.add_button(label="Show Random Densities", callback=show_rand_kde, user_data=context)
+                    dpg.add_button(
+                        label="Show Squiggle Plot",
+                        callback=show_raw, user_data=context
+                    )
+                    dpg.add_button(
+                        label="Show Density Plot",
+                        callback=show_kde, user_data=context
+                    )
+                    dpg.add_button(
+                        label="Show Random Densities",
+                        callback=show_rand_kde, user_data=context
+                    )
 
                 dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
-            with dpg.tab(label="Experiments", show=False, tag="experiment_tab"):
-                with dpg.table(header_row=True, resizable=True, tag="exp_table"):
+            with dpg.tab(label="Experiments", show=False, tag="exp_tab"):
+                with dpg.table(header_row=True, resizable=True, tag="exp_tbl"):
                     dpg.add_table_column(label="Name")
                     dpg.add_table_column(label="Filepath(s)")
                     dpg.add_table_column(label="Analyte")

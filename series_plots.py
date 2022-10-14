@@ -95,7 +95,11 @@ def _get_series_data(
         y_lims = (-0.05, 0.2)
     else:
         #TODO: find suitable error handling
-        raise ArgumentError(f"Flavour {flavour} is no valid series flavour. Use \'raw\' or \'dens\'")
+        msg = [
+            f"Flavour {flavour} is no valid series flavour.",
+            "Use \'raw\' or \'dens\'"
+        ]
+        raise ArgumentError(" ".join(msg))
     return SeriesData(title, x_label, x_lims, x_data, y_label, y_lims, y_data)
 
 
