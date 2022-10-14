@@ -34,8 +34,28 @@ def _plot_series(target: DpgItem, data: SeriesData) -> None:
 
         for x_data, y_data in zip(data.x_datas, data.y_datas):
             dpg.add_line_series(x_data, y_data, parent=y_axis)
+
+        # series = dpg.last_item()
+
+        # def _event_count_callback():
+        #     burnin = dpg.get_value("burnin")
+        #     event_boundary_low = dpg.get_value("event_boundary_low")
+        #     event_boundary_high = dpg.get_value("event_boundary_high")
+        #     print(f"calculating events for burnin {burnin}, between {event_boundary_low}pA and {event_boundary_high}pA.")
+        # def _toggle_lines(sender):
+        #     dpg.configure_item("event_boundary_low", show=dpg.get_value(sender))
+        #     dpg.configure_item("event_boundary_high", show=dpg.get_value(sender))
+        #     dpg.configure_item("burnin_line", show=dpg.get_value(sender))
+
+        # dpg.add_button(label="eventcount", tag="event_count", callback=_event_count_callback, parent=series)
+        # dpg.add_button(label="Toggle event boundaries", tag="toggle_event_bounds", callback=_toggle_lines, parent=series)
+
+        # dpg.add_drag_line(label="burnin_line", color=[255, 255, 255, 255], default_value=350_000)
+        # dpg.add_drag_line(label="event_boundary_low", color=[255, 0, 0, 255], default_value=50, vertical=False)
+        # dpg.add_drag_line(label="event_boundary_high", color=[255, 0, 0, 255], default_value=150, vertical=False)
         dpg.set_axis_limits_auto(x_axis)
         dpg.set_axis_limits_auto(y_axis)
+
     dpg.configure_item(target, on_close=lambda:dpg.delete_item(plt))
 
 def _get_kdes(
