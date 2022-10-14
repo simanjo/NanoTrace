@@ -1,10 +1,11 @@
 from typing import Dict, Any, Union
-import dearpygui.dearpygui as dpg
-from themes import custom_theme
 from os import path
+
+import dearpygui.dearpygui as dpg
 
 from series_plots import show_kde, show_rand_kde, show_raw
 from context import Context
+from themes import custom_theme
 
 DpgItem = Union[int, str]
 

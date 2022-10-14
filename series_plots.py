@@ -1,10 +1,11 @@
-#%%
 from argparse import ArgumentError
 from dataclasses import dataclass
 import random
 from typing import Literal, Union, Any, Collection, Sequence, List
+
 import dearpygui.dearpygui as dpg
 import statsmodels.api as sm
+
 from fast5_research.fast5_bulk import BulkFast5
 from context import Context
 
