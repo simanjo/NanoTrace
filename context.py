@@ -4,7 +4,7 @@ from os import path
 import dearpygui.dearpygui as dpg
 
 from experiment import Experiment
-from utils import get_active_channels, parse_exp_name
+import utils
 from python_toolbox.util import get_file_hash
 
 # HACK
@@ -46,7 +46,7 @@ class Context:
         if hash not in self.exps.keys():
             # TODO: add different hash algorithms?
             fname = path.split(fpath)[1]
-            properties = parse_exp_name(fname)
+            properties = utils.parse_exp_name(fname)
             exp = Experiment(fname, fpath, {'blake2b': hash}, None, properties)
             self.exps[hash] = exp
         else:
@@ -55,7 +55,7 @@ class Context:
 
     def get_active_channels(self) -> List[int]:
         if (chans := self.active_exp.active_channels) is None:
-            chans = get_active_channels(
+            chans = utils.get_active_channels(
                 self.active_exp.path,
                 DEFAULT_SETTINGS['burnin']
             )
