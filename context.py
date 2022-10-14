@@ -15,6 +15,7 @@ DEFAULT_SETTINGS = {
 
 DpgItem = Union[int, str]
 
+
 class Context:
 
     # Mutable default value {} for exps on purpose.
@@ -60,7 +61,6 @@ class Context:
         else:
             exp = self.exps[hash]
         self.active_exp = exp
-
 
     def get_active_channels(self) -> List[int]:
         if (chans := self.active_exp.active_channels) is None:

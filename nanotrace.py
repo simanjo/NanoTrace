@@ -8,6 +8,7 @@ from context import Context
 
 DpgItem = Union[int, str]
 
+
 def set_active_channels() -> None:
     global context
     # first thing to happen: button vanishes
@@ -15,6 +16,7 @@ def set_active_channels() -> None:
     dpg.configure_item("channel", items=context.get_active_channels())
     dpg.configure_item("func_choose", show=True)
     dpg.configure_item("toggle_channels", show=True)
+
 
 def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
     global context
@@ -45,6 +47,7 @@ def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
         dpg.configure_item("channel", items=list(range(1,127)))
         dpg.configure_item("get_active_channels", show=True)
 
+
 def toggle_active_channels(sender: DpgItem) -> None:
     global context
 
@@ -60,6 +63,7 @@ def _add_file_dialog():
     with dpg.file_dialog(directory_selector=False, show=False, callback=choose_file, id="file_dialog", width=500, height=400):
         dpg.add_file_extension(".*")
         dpg.add_file_extension(".fast5", color=(0, 255, 255, 255), custom_text="[fast5]")
+
 
 def _add_command_central():
     global context
@@ -118,6 +122,7 @@ def main():
     _start_app()
 
     dpg.destroy_context()
+
 
 if __name__ == '__main__':
     main()

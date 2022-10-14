@@ -11,6 +11,7 @@ from context import Context
 DpgItem = Union[int, str]
 #TODO: resolve progress bar issue...
 
+
 # cf. https://www.python.org/dev/peps/pep-0484/#the-numeric-tower
 # int is ok where float is required
 @dataclass
@@ -38,6 +39,7 @@ def _plot_series(target: DpgItem, data: SeriesData) -> None:
         dpg.set_axis_limits_auto(y_axis)
     dpg.configure_item(target, on_close=lambda:dpg.delete_item(plt))
 
+
 def _get_kdes(
     context: Context, channels: List[int]
 ) -> List[sm.nonparametric.KDEUnivariate]:
@@ -62,6 +64,7 @@ def _get_kdes(
         kdes.append(kde)
     dpg.configure_item(progress_bar, show=False)
     return kdes
+
 
 def _get_series_data(
     context: Context,
@@ -95,6 +98,7 @@ def _get_series_data(
         raise ArgumentError(f"Flavour {flavour} is no valid series flavour. Use \'raw\' or \'dens\'")
     return SeriesData(title, x_label, x_lims, x_data, y_label, y_lims, y_data)
 
+
 def show_raw(
     sender: DpgItem,
     app_data: Any,
@@ -107,6 +111,7 @@ def show_raw(
     target = dpg.add_window(label="Raw Data", width=800, height=600)
     _plot_series(target, series_data)
 
+
 def show_kde(
     sender: DpgItem,
     app_data: Any,
@@ -118,6 +123,7 @@ def show_kde(
     series_data = _get_series_data(user_data, "dens", [channel])
     target = dpg.add_window(label="Kernel Density", width=800, height=600)
     _plot_series(target, series_data)
+
 
 def show_rand_kde(
     sender: DpgItem,
