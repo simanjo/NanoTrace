@@ -7,7 +7,7 @@ from experiment import Experiment
 from utils import get_active_channels, parse_exp_name
 from python_toolbox.util import get_file_hash
 
-## HACK
+# HACK
 DEFAULT_SETTINGS = {
     'kde_resolution': 1_000_000,
     'burnin': 350_000

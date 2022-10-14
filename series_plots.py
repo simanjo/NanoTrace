@@ -9,7 +9,7 @@ from fast5_research.fast5_bulk import BulkFast5
 from context import Context
 
 DpgItem = Union[int, str]
-#TODO: resolve progress bar issue...
+# TODO: resolve progress bar issue...
 
 
 # cf. https://www.python.org/dev/peps/pep-0484/#the-numeric-tower
@@ -37,7 +37,7 @@ def _plot_series(target: DpgItem, data: SeriesData) -> None:
             dpg.add_line_series(x_data, y_data, parent=y_axis)
         dpg.set_axis_limits_auto(x_axis)
         dpg.set_axis_limits_auto(y_axis)
-    dpg.configure_item(target, on_close=lambda:dpg.delete_item(plt))
+    dpg.configure_item(target, on_close=lambda: dpg.delete_item(plt))
 
 
 def _get_kdes(
@@ -47,7 +47,7 @@ def _get_kdes(
     burnin = context.settings['burnin']
     kde_resolution = context.settings['kde_resolution']
 
-    progress_bar = "Progress Bar" #context.get_progress_bar()
+    progress_bar = "Progress Bar"  #context.get_progress_bar()
     dpg.configure_item(progress_bar, show=True, width=175)
     kdes = []
     for count, chan in enumerate(channels):
@@ -84,7 +84,7 @@ def _get_series_data(
         x_lims = (0, 100_000)
         y_label = "current [pA]"
         y_lims = (-20, 350)
-        x_data = [list(range(0,len(y_data[0])))]
+        x_data = [list(range(0, len(y_data[0])))]
     elif flavour == 'dens':
         kdes = _get_kdes(context, channels)
         x_data = [kde.support for kde in kdes]

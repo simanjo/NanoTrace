@@ -44,7 +44,7 @@ def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
         dpg.configure_item("toggle_channels", show=True)
         dpg.configure_item("func_choose", show=True)
     else:
-        dpg.configure_item("channel", items=list(range(1,127)))
+        dpg.configure_item("channel", items=list(range(1, 127)))
         dpg.configure_item("get_active_channels", show=True)
 
 
@@ -52,7 +52,7 @@ def toggle_active_channels(sender: DpgItem) -> None:
     global context
 
     if dpg.get_value(sender):
-        dpg.configure_item("channel", items=list(range(1,127)))
+        dpg.configure_item("channel", items=list(range(1, 127)))
     else:
         dpg.configure_item("channel", context.active_exp.active_channels)
 
