@@ -28,9 +28,9 @@ def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
     # TODO/HACK: invent state interface to allow for
     #            easier switching of displayed stuff
     context.update_context(
-        fpath, progressbar="Progress Bar", table="exp_table"
+        fpath, progressbar="Progress Bar", table="exp_tbl"
     )
-    dpg.configure_item("experiment_tab", show=True)
+    dpg.configure_item("exp_tab", show=True)
     dpg.set_value("filename", context.active_exp.name)
     dpg.configure_item("filename", show=True)
     dpg.configure_item("channel_choose", show=True)
