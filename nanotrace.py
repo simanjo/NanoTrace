@@ -1,5 +1,4 @@
 from typing import Dict, Any, Union
-from os import path
 
 import dearpygui.dearpygui as dpg
 
@@ -11,7 +10,6 @@ DpgItem = Union[int, str]
 
 
 def set_active_channels() -> None:
-    global context
     # first thing to happen: button vanishes
     dpg.configure_item("get_active_channels", show=False)
     dpg.configure_item("channel", items=context.get_active_channels())
@@ -24,7 +22,6 @@ def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
 
     try:
         fpath = list(app_data['selections'].values())[0]
-        fname = path.splitext(list(app_data['selections'].keys())[0])[0]
     except KeyError:
         return
 
@@ -60,8 +57,8 @@ def toggle_active_channels(sender: DpgItem) -> None:
         dpg.configure_item("channel", context.active_exp.active_channels)
 
 
-################# Setup functions ############################################
-#TODO: build OO interface for sounder intialization
+# ################ Setup functions ############################################
+# TODO: build OO interface for sounder intialization
 def _add_file_dialog():
     with dpg.file_dialog(
         directory_selector=False, show=False, callback=choose_file,

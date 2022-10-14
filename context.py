@@ -21,7 +21,7 @@ class Context:
     # Mutable default value {} for exps on purpose.
     # There should only ever be one context at runtime...
     def __init__(
-        self, exps = {}, settings = DEFAULT_SETTINGS
+        self, exps={}, settings=DEFAULT_SETTINGS
     ) -> None:
 
         self.exps: Dict[str, Experiment] = exps

@@ -48,7 +48,7 @@ def _get_kdes(
     burnin = context.settings['burnin']
     kde_resolution = context.settings['kde_resolution']
 
-    progress_bar = "Progress Bar"  #context.get_progress_bar()
+    progress_bar = "Progress Bar"
     dpg.configure_item(progress_bar, show=True, width=175)
     kdes = []
     for count, chan in enumerate(channels):
@@ -95,7 +95,7 @@ def _get_series_data(
         y_label = "density"
         y_lims = (-0.05, 0.2)
     else:
-        #TODO: find suitable error handling
+        # TODO: find suitable error handling
         msg = [
             f"Flavour {flavour} is no valid series flavour.",
             "Use \'raw\' or \'dens\'"
