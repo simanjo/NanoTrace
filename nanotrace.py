@@ -2,7 +2,7 @@ from typing import Dict, Any, Union
 
 import dearpygui.dearpygui as dpg
 
-from series_plots import show_kde, show_rand_kde, show_raw
+from series_plots import show_kde, show_rand_kde, show_raw, show_events
 from context import Context
 from themes import custom_theme
 
@@ -28,9 +28,9 @@ def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
     # TODO/HACK: invent state interface to allow for
     #            easier switching of displayed stuff
     context.update_context(
-        fpath, progressbar="Progress Bar", table="exp_table"
+        fpath, progressbar="Progress Bar", table="exp_tbl"
     )
-    dpg.configure_item("experiment_tab", show=True)
+    dpg.configure_item("exp_tab", show=True)
     dpg.set_value("filename", context.active_exp.name)
     dpg.configure_item("filename", show=True)
     dpg.configure_item("channel_choose", show=True)
@@ -111,6 +111,10 @@ def _add_command_central():
                     dpg.add_button(
                         label="Show Random Densities",
                         callback=show_rand_kde, user_data=context
+                    )
+                    dpg.add_button(
+                        label="Get Event Densities",
+                        callback=show_events, user_data=context
                     )
 
                 dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
