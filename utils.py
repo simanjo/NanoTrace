@@ -37,7 +37,7 @@ def parse_exp_name(name):
     properties = dict()
 
     # try to guess concentration from name if that fails
-    # for whatever reaseon, concentration is NaN
+    # for whatever reason, concentration is NaN
     conc = np.nan
     try:
         match = re.search(
