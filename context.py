@@ -30,8 +30,7 @@ class Context:
 
     def update_context(
         self, fpath: str,
-        progressbar: Optional[DpgItem] = None,
-        table: Optional[DpgItem] = None
+        progressbar: Optional[DpgItem] = None
     ) -> None:
         # TODO: add sanity checks for file values
         # calculate hash first and check if experiment is known
@@ -50,14 +49,6 @@ class Context:
             properties = parse_exp_name(fname)
             exp = Experiment(fname, fpath, {'blake2b': hash}, None, properties)
             self.exps[hash] = exp
-            if table is not None:
-                print(f"adding stuffs to table {table}")
-                with dpg.table_row(parent=table):
-                    dpg.add_text(fname)
-                    dpg.add_text(fpath)
-                    dpg.add_text("TODO")
-                    dpg.add_text(f"{properties['concentration']} nM")
-                    dpg.add_text("---")
         else:
             exp = self.exps[hash]
         self.active_exp = exp
