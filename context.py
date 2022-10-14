@@ -52,7 +52,15 @@ class Context:
             if table is not None:
                 print(f"adding stuffs to table {table}")
                 with dpg.table_row(parent=table):
-                    dpg.add_text(fname)
+
+                    # dpg.add_text(fname)
+                    with dpg.table_cell() as cell:
+                        dpg.add_text(fname)
+                        # dpg.add_item_clicked_handler(parent=cell, callback=lambda:print("click°!"))
+                    # with dpg.handler_registry() as click_handler:
+                    #     dpg.add_item_clicked_handler(callback=lambda:print("click°!"))
+                    # dpg.bind_item_handler_registry(cell, click_handler)
+                        # dpg.add_mouse_double_click_handler()
                     dpg.add_text(fpath)
                     dpg.add_text("TODO")
                     dpg.add_text(f"{properties['concentration']} nM")
@@ -60,7 +68,18 @@ class Context:
         else:
             exp = self.exps[hash]
         self.active_exp = exp
+        print(exp)
 
+
+    # def get_context() -> Dict[str, Any]:
+
+
+    # def _get_active_exp_props() -> Dict[str, Any]:
+    #     return _get_props(_get_active_exp())
+
+    # def _get_context() -> Dict[str, Any]:
+    #     context = {**_get_settings(), **_get_active_exp_props()}
+    #     return context
 
     def get_active_channels(self) -> List[int]:
         if (chans := self.active_exp.active_channels) is None:
