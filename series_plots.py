@@ -1,15 +1,17 @@
-#%%
 from argparse import ArgumentError
 from dataclasses import dataclass
 import random
 from typing import Literal, Union, Any, Collection, Sequence, List
+
 import dearpygui.dearpygui as dpg
 import statsmodels.api as sm
+
 from fast5_research.fast5_bulk import BulkFast5
 from context import Context
 
 DpgItem = Union[int, str]
-#TODO: resolve progress bar issue...
+# TODO: resolve progress bar issue...
+
 
 # cf. https://www.python.org/dev/peps/pep-0484/#the-numeric-tower
 # int is ok where float is required
@@ -55,8 +57,8 @@ def _plot_series(target: DpgItem, data: SeriesData) -> None:
         # dpg.add_drag_line(label="event_boundary_high", color=[255, 0, 0, 255], default_value=150, vertical=False)
         dpg.set_axis_limits_auto(x_axis)
         dpg.set_axis_limits_auto(y_axis)
+    dpg.configure_item(target, on_close=lambda: dpg.delete_item(plt))
 
-    dpg.configure_item(target, on_close=lambda:dpg.delete_item(plt))
 
 def _get_kdes(
     context: Context, channels: List[int]
@@ -65,7 +67,7 @@ def _get_kdes(
     burnin = context.settings['burnin']
     kde_resolution = context.settings['kde_resolution']
 
-    progress_bar = "Progress Bar" #context.get_progress_bar()
+    progress_bar = "Progress Bar"
     dpg.configure_item(progress_bar, show=True, width=175)
     kdes = []
     for count, chan in enumerate(channels):
@@ -82,6 +84,7 @@ def _get_kdes(
         kdes.append(kde)
     dpg.configure_item(progress_bar, show=False)
     return kdes
+
 
 def _get_series_data(
     context: Context,
@@ -101,7 +104,7 @@ def _get_series_data(
         x_lims = (0, 100_000)
         y_label = "current [pA]"
         y_lims = (-20, 350)
-        x_data = [list(range(0,len(y_data[0])))]
+        x_data = [list(range(0, len(y_data[0])))]
     elif flavour == 'dens':
         kdes = _get_kdes(context, channels)
         x_data = [kde.support for kde in kdes]
@@ -111,9 +114,14 @@ def _get_series_data(
         y_label = "density"
         y_lims = (-0.05, 0.2)
     else:
-        #TODO: find suitable error handling
-        raise ArgumentError(f"Flavour {flavour} is no valid series flavour. Use \'raw\' or \'dens\'")
+        # TODO: find suitable error handling
+        msg = [
+            f"Flavour {flavour} is no valid series flavour.",
+            "Use \'raw\' or \'dens\'"
+        ]
+        raise ArgumentError(" ".join(msg))
     return SeriesData(title, x_label, x_lims, x_data, y_label, y_lims, y_data)
+
 
 def show_raw(
     sender: DpgItem,
@@ -127,6 +135,7 @@ def show_raw(
     target = dpg.add_window(label="Raw Data", width=800, height=600)
     _plot_series(target, series_data)
 
+
 def show_kde(
     sender: DpgItem,
     app_data: Any,
@@ -138,6 +147,7 @@ def show_kde(
     series_data = _get_series_data(user_data, "dens", [channel])
     target = dpg.add_window(label="Kernel Density", width=800, height=600)
     _plot_series(target, series_data)
+
 
 def show_rand_kde(
     sender: DpgItem,

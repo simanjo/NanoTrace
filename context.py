@@ -7,7 +7,7 @@ from experiment import Experiment
 from utils import get_active_channels, parse_exp_name
 from python_toolbox.util import get_file_hash
 
-## HACK
+# HACK
 DEFAULT_SETTINGS = {
     'kde_resolution': 1_000_000,
     'burnin': 350_000
@@ -15,12 +15,13 @@ DEFAULT_SETTINGS = {
 
 DpgItem = Union[int, str]
 
+
 class Context:
 
     # Mutable default value {} for exps on purpose.
     # There should only ever be one context at runtime...
     def __init__(
-        self, exps = {}, settings = DEFAULT_SETTINGS
+        self, exps={}, settings=DEFAULT_SETTINGS
     ) -> None:
 
         self.exps: Dict[str, Experiment] = exps

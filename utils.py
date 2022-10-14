@@ -3,6 +3,7 @@ import re
 import dearpygui.dearpygui as dpg
 from fast5_research.fast5_bulk import BulkFast5
 
+
 #TODO/HACK introduce seperate progress bar variable
 #          and simplify handling thereof
 def _is_active_channel(fname: str, channel: int, burnin: int) -> bool:
@@ -18,10 +19,12 @@ def _is_active_channel(fname: str, channel: int, burnin: int) -> bool:
         and len(raw_data[np.logical_and(raw_data > 150, raw_data < 350)]) > 0
     )
 
+
 def _update_channel_progress(channel: int) -> bool:
     dpg.set_value("Progress Bar", (channel-1)/126)
     dpg.configure_item("Progress Bar", overlay=f"Checking channel {channel}/126", width=175)
     return True
+
 
 def get_active_channels(fname: int, burnin: int = 350000) -> bool:
     dpg.configure_item("Progress Bar", show=True)
@@ -32,6 +35,7 @@ def get_active_channels(fname: int, burnin: int = 350000) -> bool:
 
     dpg.configure_item("Progress Bar", show=False)
     return result
+
 
 def parse_exp_name(name):
     properties = dict()
