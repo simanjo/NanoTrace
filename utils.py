@@ -4,7 +4,7 @@ import dearpygui.dearpygui as dpg
 from fast5_research.fast5_bulk import BulkFast5
 
 
-#TODO/HACK introduce seperate progress bar variable
+# TODO/HACK introduce seperate progress bar variable
 #          and simplify handling thereof
 def _is_active_channel(fname: str, channel: int, burnin: int) -> bool:
     try:
@@ -22,15 +22,19 @@ def _is_active_channel(fname: str, channel: int, burnin: int) -> bool:
 
 def _update_channel_progress(channel: int) -> bool:
     dpg.set_value("Progress Bar", (channel-1)/126)
-    dpg.configure_item("Progress Bar", overlay=f"Checking channel {channel}/126", width=175)
+    dpg.configure_item(
+        "Progress Bar", overlay=f"Checking channel {channel}/126", width=175
+    )
     return True
 
 
-def get_active_channels(fname: int, burnin: int = 350000) -> bool:
+def get_active_channels(fname: str, burnin: int = 350000) -> bool:
     dpg.configure_item("Progress Bar", show=True)
 
     result = [
-        c for c in range(1,127) if _update_channel_progress(c) and _is_active_channel(fname, c, burnin)
+        c for c in range(1, 127)
+        if _update_channel_progress(c) and
+        _is_active_channel(fname, c, burnin)
     ]
 
     dpg.configure_item("Progress Bar", show=False)
@@ -55,12 +59,12 @@ def parse_exp_name(name):
             concentration = float(match.group('conc'))
             expo = 1000 if match.group('exp') == "mikro" else 1
             conc = int(concentration*expo)
-    except:
+    except BaseException:
         print(f"Couldn't determine concentration for {name}")
         print(f"Having {match}")
     finally:
         properties["concentration"] = conc
-    
+
     if "ochratoxin" in name.lower():
         properties["hplc"] = False
         properties["special_run"] = False
