@@ -71,10 +71,10 @@ def toggle_active_channels(
 
 # ################ Setup functions ############################################
 # TODO: build OO interface for sounder intialization
-def _add_file_dialog():
+def _add_file_dialog(context: Context):
     with dpg.file_dialog(
         directory_selector=False, show=False, callback=choose_file,
-        id="file_dialog", width=500, height=400
+        user_data=context, id="file_dialog", width=500, height=400
     ):
         dpg.add_file_extension(".*")
         dpg.add_file_extension(
@@ -103,12 +103,14 @@ def _add_command_central(context: Context):
                     dpg.add_button(
                         label="Get Active Channels",
                         tag="get_active_channels",
-                        callback=set_active_channels, show=False
+                        callback=set_active_channels,
+                        user_data=context, show=False
                     )
                     dpg.add_checkbox(
                         label="Show All Channels",
                         tag='toggle_channels',
-                        callback=toggle_active_channels, show=False
+                        callback=toggle_active_channels,
+                        user_data=context, show=False
                     )
                 with dpg.group(tag="func_choose", show=False):
                     dpg.add_button(
@@ -155,7 +157,7 @@ def main():
     dpg.create_context()
 
     context = Context(cwd=_get_main_dir())
-    _add_file_dialog()
+    _add_file_dialog(context)
     _add_command_central(context)
     # _add_raw_data_window()
     # _add_kde_window()
