@@ -146,11 +146,3 @@ def show_rand_kde(
     series_data = _get_series_data(user_data, "dens", chans)
     target = dpg.add_window(label="Kernel Density", width=800, height=600)
     _plot_series(target, series_data)
-
-
-def show_events(
-    sender: DpgItem,
-    app_data: Any,
-    user_data: Context
-) -> None:
-    pass

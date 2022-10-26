@@ -125,10 +125,6 @@ def _add_command_central(context: Context):
                         label="Show Random Densities",
                         callback=show_rand_kde, user_data=context
                     )
-                    dpg.add_button(
-                        label="Get Event Densities",
-                        callback=show_events, user_data=context
-                    )
 
                 dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
 
