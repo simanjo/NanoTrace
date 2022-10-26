@@ -4,7 +4,7 @@ from pathlib import Path
 
 import dearpygui.dearpygui as dpg
 
-from series_plots import show_kde, show_rand_kde, show_raw, show_events
+from series_plots import show_kde, show_rand_kde, show_raw
 from context import Context
 from themes import custom_theme
 from python_toolbox.util import split_string_to_size
