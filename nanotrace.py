@@ -10,17 +10,23 @@ from python_toolbox.util import split_string_to_size
 DpgItem = Union[int, str]
 
 
-def set_active_channels() -> None:
+def set_active_channels(
+    sender: DpgItem,
+    app_data: Any,
+    user_data: Context
+) -> None:
     # first thing to happen: button vanishes
     dpg.configure_item("get_active_channels", show=False)
-    dpg.configure_item("channel", items=context.get_active_channels())
+    dpg.configure_item("channel", items=user_data.get_active_channels())
     dpg.configure_item("func_choose", show=True)
     dpg.configure_item("toggle_channels", show=True)
 
 
-def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
-    global context
-
+def choose_file(
+    sender: DpgItem,
+    app_data: Dict[str, Any],
+    user_data: Context
+) -> None:
     try:
         fpath = list(app_data['selections'].values())[0]
     except KeyError:
@@ -28,10 +34,10 @@ def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
 
     # TODO/HACK: invent state interface to allow for
     #            easier switching of displayed stuff
-    context.update_context(fpath, progressbar="Progress Bar")
+    user_data.update_context(fpath, progressbar="Progress Bar")
     dpg.set_value(
         "filename",
-        "\n".join(split_string_to_size(context.active_exp.name, 60, sep="_"))
+        "\n".join(split_string_to_size(user_data.active_exp.name, 60, sep="_"))
     )
     dpg.configure_item("filename", show=True)
     dpg.configure_item("channel_choose", show=True)
@@ -40,7 +46,7 @@ def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
     dpg.configure_item("toggle_channels", show=False)
     dpg.configure_item("func_choose", show=False)
 
-    if (chans := context.active_exp.active_channels) is not None:
+    if (chans := user_data.active_exp.active_channels) is not None:
         dpg.configure_item("channel", items=chans)
         dpg.configure_item("toggle_channels", show=True)
         dpg.configure_item("func_choose", show=True)
@@ -49,13 +55,16 @@ def choose_file(sender: DpgItem, app_data: Dict[str, Any]) -> None:
         dpg.configure_item("get_active_channels", show=True)
 
 
-def toggle_active_channels(sender: DpgItem) -> None:
-    global context
-
+def toggle_active_channels(
+    sender: DpgItem,
+    app_data: Any,
+    user_data: Context
+) -> None:
     if dpg.get_value(sender):
         dpg.configure_item("channel", items=list(range(1, 127)))
     else:
-        dpg.configure_item("channel", context.active_exp.active_channels)
+        if (chans := user_data.active_exp.active_channels) is not None:
+            dpg.configure_item("channel", items=chans)
 
 
 # ################ Setup functions ############################################
@@ -71,8 +80,7 @@ def _add_file_dialog():
         )
 
 
-def _add_command_central():
-    global context
+def _add_command_central(context: Context):
     with dpg.window(
         tag="main_window", autosize=True,
         no_close=True, no_collapse=True
@@ -135,13 +143,11 @@ def _start_app():
 ##############################################################################
 
 def main():
-    global context
-
     dpg.create_context()
 
     context = Context()
     _add_file_dialog()
-    _add_command_central()
+    _add_command_central(context)
     # _add_raw_data_window()
     # _add_kde_window()
 
