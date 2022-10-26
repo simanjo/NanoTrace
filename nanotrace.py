@@ -1,4 +1,6 @@
 from typing import Dict, Any, Union
+import sys
+from pathlib import Path
 
 import dearpygui.dearpygui as dpg
 
@@ -140,12 +142,19 @@ def _start_app():
     dpg.start_dearpygui()
 
 
+def _get_main_dir():
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        return Path(sys.executable).parent
+    else:
+        return Path(__file__).parent
+
+
 ##############################################################################
 
 def main():
     dpg.create_context()
 
-    context = Context()
+    context = Context(cwd=_get_main_dir())
     _add_file_dialog()
     _add_command_central(context)
     # _add_raw_data_window()

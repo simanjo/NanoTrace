@@ -1,5 +1,7 @@
 from typing import Dict, Any, List, Optional, Union
 from os import path
+from pathlib import Path
+import pickle
 
 import dearpygui.dearpygui as dpg
 
@@ -18,14 +20,15 @@ DpgItem = Union[int, str]
 
 class Context:
 
-    # Mutable default value {} for exps on purpose.
-    # There should only ever be one context at runtime...
     def __init__(
-        self, exps={}, settings=DEFAULT_SETTINGS
+        self, cwd, settings=DEFAULT_SETTINGS
     ) -> None:
 
-        self.exps: Dict[str, Experiment] = exps
         self.settings: Dict[str, Any] = settings
+        self.cwd = cwd
+
+        exps = self._load_exps()
+        self.exps: Dict[str, Experiment] = exps
         self.active_exp: Optional[Experiment] = None
 
     def update_context(
@@ -62,3 +65,25 @@ class Context:
             chans = list(details.keys())
             self.active_exp.band_distribution = details
         return chans
+
+    def _load_exps(self) -> Dict[str, Experiment]:
+        if not (exp_db := (Path(self.cwd) / "experiments.db")).is_file():
+            return {}
+
+        with open(exp_db, 'rb') as fh:
+            exp_dict = pickle.load(fh)
+        return self._sanitize_exps(exp_dict)
+
+    def _sanitize_exps(self, exp_dict) -> Dict[str, Experiment]:
+        # TODO: add version tag and version check
+        # and reasoning about settings
+        return exp_dict['exps']
+
+    def _dump_exps(self, cwd: str = None) -> None:
+        dump = {
+            'settings': self.settings,
+            'exps': self.exps
+        }
+        cwd = self.cwd if cwd is None else cwd
+        with open(Path(cwd) / "experiments.db", 'wb') as fh:
+            pickle.dump(dump, fh)
