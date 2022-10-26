@@ -125,8 +125,21 @@ def _add_command_central(context: Context):
                         label="Show Random Densities",
                         callback=show_rand_kde, user_data=context
                     )
+                    dpg.add_button(
+                        label="Save Experiments and Quit",
+                        callback=_save_and_quit, user_data=context
+                    )
 
                 dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
+
+
+def _save_and_quit(
+    sender: DpgItem,
+    app_data: Any,
+    user_data: Context
+) -> None:
+    user_data._dump_exps()
+    dpg.stop_dearpygui()
 
 
 def _start_app():
