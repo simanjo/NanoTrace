@@ -125,12 +125,13 @@ def _add_command_central(context: Context):
                         label="Show Random Densities",
                         callback=show_rand_kde, user_data=context
                     )
-                    dpg.add_button(
-                        label="Save Experiments and Quit",
-                        callback=_save_and_quit, user_data=context
-                    )
-
+                dpg.add_spacer(height=5)
                 dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
+                dpg.add_spacer(height=5)
+                dpg.add_button(
+                    label="Save Experiments and Quit",
+                    callback=_save_and_quit, user_data=context
+                )
 
 
 def _save_and_quit(
