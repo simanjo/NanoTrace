@@ -3,6 +3,8 @@ import re
 import dearpygui.dearpygui as dpg
 from fast5_research.fast5_bulk import BulkFast5
 
+from typing import Any, Dict, List, Optional
+
 
 # TODO/HACK introduce seperate progress bar variable
 #          and simplify handling thereof
@@ -28,17 +30,75 @@ def _update_channel_progress(channel: int) -> bool:
     return True
 
 
-def get_active_channels(fname: str, burnin: int = 350000) -> bool:
+def get_channel_details(
+    fname: str, burnin: int = 350000
+) -> Dict[int, Dict[str, float]]:
     dpg.configure_item("Progress Bar", show=True)
 
-    result = [
-        c for c in range(1, 127)
+    result = {
+        c: band_details for c in range(1, 127)
         if _update_channel_progress(c) and
-        _is_active_channel(fname, c, burnin)
-    ]
+        _is_active_channel(fname, c, burnin) and
+        (band_details := _get_band_densities(fname, c, burnin)) is not None
+    }
 
     dpg.configure_item("Progress Bar", show=False)
     return result
+
+
+def get_baseline(raw_data):
+    baseline = None
+
+    try:
+        if np.abs(np.mean(raw_data)) > 1:
+            baseline = int(np.median(
+                raw_data[np.logical_and(raw_data > 150, raw_data < 350)]
+            ))
+    finally:
+        return baseline
+
+
+def _get_band_densities(
+        fname: str, channel: int, burnin: int,
+        event_low: int = 0.25, event_high: int = 0.5
+) -> Optional[Dict[int, Dict[str, Any]]]:
+    try:
+        with BulkFast5(fname) as fh:
+            raw_data = fh.get_raw(channel)[burnin:]
+    except Exception as e:
+        print(e)
+        return None
+
+    if (baseline_val := get_baseline(raw_data)) is None:
+        return None
+
+    low_outs = np.sum(np.logical_and(-100 < raw_data, raw_data < -5))
+    zeroes = np.sum(np.logical_and(-5 <= raw_data, raw_data <= 5))
+    events = np.sum(np.logical_and(
+        event_low*baseline_val < raw_data,
+        raw_data < event_high*baseline_val
+    ))
+    baselines = np.sum(np.logical_and(
+        baseline_val - 30 <= raw_data,
+        raw_data <= baseline_val + 30
+    ))
+    high_outs = np.sum(np.logical_and(
+        baseline_val + 30 < raw_data,
+        raw_data < 350
+    ))
+    heavy_outs = np.sum(np.logical_or(
+        raw_data <= -100,
+        max(350, baseline_val + 30) <= raw_data
+    ))
+    return (
+        baseline_val,
+        {
+            'outlier': (low_outs, high_outs, heavy_outs),
+            'zeroes': zeroes,
+            'events': events,
+            'baseline': baselines,
+        }
+    )
 
 
 def parse_exp_name(name):

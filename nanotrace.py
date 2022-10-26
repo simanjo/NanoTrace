@@ -46,7 +46,7 @@ def choose_file(
     dpg.configure_item("toggle_channels", show=False)
     dpg.configure_item("func_choose", show=False)
 
-    if (chans := user_data.active_exp.active_channels) is not None:
+    if (chans := user_data.active_exp.get_active_channels()) is not None:
         dpg.configure_item("channel", items=chans)
         dpg.configure_item("toggle_channels", show=True)
         dpg.configure_item("func_choose", show=True)
@@ -63,7 +63,7 @@ def toggle_active_channels(
     if dpg.get_value(sender):
         dpg.configure_item("channel", items=list(range(1, 127)))
     else:
-        if (chans := user_data.active_exp.active_channels) is not None:
+        if (chans := user_data.active_exp.get_active_channels()) is not None:
             dpg.configure_item("channel", items=chans)
 
 

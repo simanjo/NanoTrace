@@ -47,17 +47,18 @@ class Context:
             # TODO: add different hash algorithms?
             fname = path.split(fpath)[1]
             properties = utils.parse_exp_name(fname)
-            exp = Experiment(fname, fpath, {'blake2b': hash}, None, properties)
+            exp = Experiment(fname, fpath, {'blake2b': hash}, properties)
             self.exps[hash] = exp
         else:
             exp = self.exps[hash]
         self.active_exp = exp
 
     def get_active_channels(self) -> List[int]:
-        if (chans := self.active_exp.active_channels) is None:
-            chans = utils.get_active_channels(
+        if (chans := self.active_exp.get_active_channels()) is None:
+            details = utils.get_channel_details(
                 self.active_exp.path,
                 DEFAULT_SETTINGS['burnin']
             )
-            self.active_exp.active_channels = chans
+            chans = list(details.keys())
+            self.active_exp.band_distribution = details
         return chans
