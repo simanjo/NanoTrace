@@ -4,10 +4,12 @@ from pathlib import Path
 
 import dearpygui.dearpygui as dpg
 
+from experiment import Experiment
 from series_plots import show_kde, show_rand_kde, show_raw
 from context import Context
 from themes import custom_theme
 from python_toolbox.util import split_string_to_size
+from utils import event_density
 
 DpgItem = Union[int, str]
 
@@ -22,6 +24,7 @@ def set_active_channels(
     dpg.configure_item("channel", items=user_data.get_active_channels())
     dpg.configure_item("func_choose", show=True)
     dpg.configure_item("toggle_channels", show=True)
+    _show_experiment_info(user_data.active_exp)
 
 
 def choose_file(
@@ -54,9 +57,20 @@ def choose_file(
         dpg.configure_item("channel", items=chans)
         dpg.configure_item("toggle_channels", show=True)
         dpg.configure_item("func_choose", show=True)
+        _show_experiment_info(user_data.active_exp)
     else:
         dpg.configure_item("channel", items=list(range(1, 127)))
         dpg.configure_item("get_active_channels", show=True)
+
+
+def _show_experiment_info(exp: Experiment) -> None:
+    dpg.set_value("active_channels_info", len(exp.get_active_channels()))
+    mean, sd = exp.get_mean_events()
+    dpg.set_value("avg_event_info", f"{mean} (+/-{2*sd})")
+    mean_bl, sd_bl = exp.get_mean_baselines()
+    dpg.set_value("avg_baseline_info", f"{mean_bl} (+/-{2*sd_bl})")
+    dpg.set_value("concentration_info", exp.properties['concentration'])
+    dpg.configure_item("exp_info", show=True)
 
 
 def toggle_active_channels(
