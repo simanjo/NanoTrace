@@ -39,7 +39,7 @@ def get_channel_details(
         c: band_details for c in range(1, 127)
         if _update_channel_progress(c) and
         _is_active_channel(fname, c, burnin) and
-        (band_details := _get_band_densities(fname, c, burnin)) is not None
+        (band_details := _get_band_distribution(fname, c, burnin)) is not None
     }
 
     dpg.configure_item("Progress Bar", show=False)
@@ -58,7 +58,7 @@ def get_baseline(raw_data):
         return baseline
 
 
-def _get_band_densities(
+def _get_band_distribution(
         fname: str, channel: int, burnin: int,
         event_low: int = 0.25, event_high: int = 0.5
 ) -> Optional[Dict[int, Dict[str, Any]]]:
