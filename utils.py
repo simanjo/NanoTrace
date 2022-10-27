@@ -3,7 +3,7 @@ import re
 import dearpygui.dearpygui as dpg
 from fast5_research.fast5_bulk import BulkFast5
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Literal, Optional, Sequence, Union
 
 
 # TODO/HACK introduce seperate progress bar variable
@@ -99,6 +99,25 @@ def _get_band_distribution(
             'baseline': baselines,
         }
     )
+
+
+def event_density(
+    band_distr: Dict[
+        Literal['outlier', 'zeroes', 'events', 'baseline'],
+        Union[Sequence[int], int]
+    ],
+    key: str = 'events'
+) -> float:
+    run_length = sum(band_distr['outlier']) + band_distr['zeroes'] \
+                 + band_distr['events'] + band_distr['baseline']
+    # assert zeroes and heavy outliers are equally distributed amongst bands
+    length = run_length - band_distr['zeroes'] - band_distr['outlier'][2]
+    if key == "outlier":
+        return band_distr['outlier'][2] / run_length
+    elif key == "zeroes":
+        return band_distr['zeroes'] / run_length
+    else:
+        return band_distr[key] / length
 
 
 def parse_exp_name(name):
