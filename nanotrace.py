@@ -73,6 +73,31 @@ def _show_experiment_info(exp: Experiment) -> None:
     dpg.configure_item("exp_info", show=True)
 
 
+def set_channel(
+    sender: DpgItem,
+    app_data: Any,
+    user_data: Context
+) -> None:
+    channel = int(dpg.get_value(sender))
+    try:
+        bl, band = user_data.active_exp.band_distribution[channel]
+    except KeyError:
+        dpg.configure_item("channel_info", show=False)
+        return
+
+    dpg.set_value("sel_channel_info", channel)
+    dpg.set_value("sel_event_info", round(event_density(band), 4))
+    dpg.set_value("sel_baseline_info", bl)
+    dpg.set_value(
+        "sel_baseline_density_info",
+        round(event_density(band, 'baseline'), 4))
+    zeroes = round(event_density(band, 'zeroes'), 4)
+    col = (255, 0, 0, 255) if zeroes > 0.1 else (255, 255, 255, 255)
+    dpg.set_value("sel_zeroes_info", zeroes)
+    dpg.configure_item("sel_zeroes_info", color=col)
+    dpg.configure_item("channel_info", show=True)
+
+
 def toggle_active_channels(
     sender: DpgItem,
     app_data: Any,
@@ -115,7 +140,11 @@ def _add_command_central(context: Context):
                     horizontal=True, tag="channel_choose", show=False
                 ):
                     dpg.add_text("Channel:")
-                    dpg.add_combo(tag="channel", width=60)
+                    dpg.add_combo(
+                        tag="channel", width=60,
+                        callback=set_channel,
+                        user_data=context
+                        )
                     dpg.add_button(
                         label="Get Active Channels",
                         tag="get_active_channels",
