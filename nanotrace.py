@@ -36,6 +36,9 @@ def choose_file(
 
     # TODO/HACK: invent state interface to allow for
     #            easier switching of displayed stuff
+    dpg.configure_item("get_active_channels", show=False)
+    dpg.configure_item("toggle_channels", show=False)
+    dpg.configure_item("func_choose", show=False)
     user_data.update_context(fpath, progressbar="Progress Bar")
     dpg.set_value(
         "filename",
@@ -44,9 +47,6 @@ def choose_file(
     dpg.configure_item("filename", show=True)
     dpg.configure_item("channel_choose", show=True)
     dpg.set_value("channel", "")
-    dpg.configure_item("get_active_channels", show=False)
-    dpg.configure_item("toggle_channels", show=False)
-    dpg.configure_item("func_choose", show=False)
 
     if (chans := user_data.active_exp.get_active_channels()) is not None:
         dpg.configure_item("channel", items=chans)
