@@ -39,6 +39,8 @@ def choose_file(
     dpg.configure_item("get_active_channels", show=False)
     dpg.configure_item("toggle_channels", show=False)
     dpg.configure_item("func_choose", show=False)
+    dpg.configure_item("exp_info", show=False)
+    dpg.configure_item("channel_info", show=False)
     user_data.update_context(fpath, progressbar="Progress Bar")
     dpg.set_value(
         "filename",
@@ -132,6 +134,42 @@ def _add_command_central(context: Context):
                     label="Save Experiments and Quit",
                     callback=_save_and_quit, user_data=context
                 )
+
+                dpg.add_spacer(height=10)
+                with dpg.group(tag="exp_info", horizontal=True, show=False):
+                    with dpg.group(tag="general_info"):
+                        with dpg.group(horizontal=True):
+                            dpg.add_text("Active channels:")
+                            dpg.add_text(tag="active_channels_info")
+                        with dpg.group(horizontal=True):
+                            dpg.add_text("Avg event density:")
+                            with dpg.tooltip(dpg.last_item()):
+                                dpg.add_text("[mean (+/- 2*sd)]")
+                            dpg.add_text(tag="avg_event_info")
+                        with dpg.group(horizontal=True):
+                            dpg.add_text("Avg Baseline:")
+                            with dpg.tooltip(dpg.last_item()):
+                                dpg.add_text("[mean (+/- 2*sd)]")
+                            dpg.add_text(tag="avg_baseline_info")
+                        with dpg.group(horizontal=True):
+                            dpg.add_text("Concentration:")
+                            dpg.add_text(tag="concentration_info")
+                    with dpg.group(tag="channel_info", show=False):
+                        with dpg.group(horizontal=True):
+                            dpg.add_text("Selected channel:")
+                            dpg.add_text(tag="sel_channel_info")
+                        with dpg.group(horizontal=True):
+                            dpg.add_text("Event density:")
+                            dpg.add_text(tag="sel_event_info")
+                        with dpg.group(horizontal=True):
+                            dpg.add_text("Baseline: ")
+                            dpg.add_text(tag="sel_baseline_info")
+                        with dpg.group(horizontal=True):
+                            dpg.add_text("Baseline density:")
+                            dpg.add_text(tag="sel_baseline_density_info")
+                        with dpg.group(horizontal=True):
+                            dpg.add_text("Zeroes density:")
+                            dpg.add_text(tag="sel_zeroes_info")
 
 
 def _save_and_quit(
