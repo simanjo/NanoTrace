@@ -36,6 +36,8 @@ def _plot_series(target: DpgItem, data: SeriesData) -> None:
 
         for x_data, y_data in zip(data.x_datas, data.y_datas):
             dpg.add_line_series(x_data, y_data, parent=y_axis)
+        # wait a frame to have axis limits registered (some BUG/RACE here?)
+        dpg.split_frame()
         dpg.set_axis_limits_auto(x_axis)
         dpg.set_axis_limits_auto(y_axis)
     dpg.configure_item(target, on_close=lambda: dpg.delete_item(plt))
