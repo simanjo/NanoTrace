@@ -14,7 +14,7 @@ DpgItem = Union[int, str]
 def _start_app(window_tag: DpgItem):
     dpg.bind_theme(custom_theme())
 
-    dpg.create_viewport(title='NanoTrace', width=850, height=800)
+    dpg.create_viewport(title='NanoTrace', width=850, height=650)
     dpg.setup_dearpygui()
 
     dpg.show_viewport()
