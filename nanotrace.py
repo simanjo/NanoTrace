@@ -131,7 +131,7 @@ def _add_command_central(context: Context):
         tag="main_window", autosize=True,
         no_close=True, no_collapse=True
     ):
-        with dpg.tab_bar():
+        with dpg.tab_bar(tag="main_tab_bar"):
             with dpg.tab(label="Command Central"):
                 dpg.add_spacer(height=5)
                 with dpg.group(horizontal=True):
