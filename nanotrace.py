@@ -133,12 +133,14 @@ def _add_command_central(context: Context):
     ):
         with dpg.tab_bar():
             with dpg.tab(label="Command Central"):
+                dpg.add_spacer(height=5)
                 with dpg.group(horizontal=True):
                     dpg.add_button(
                         label="File Selector",
                         callback=lambda: dpg.show_item("file_dialog")
                     )
                     dpg.add_text(tag="filename", show=False)
+                dpg.add_spacer(height=10)
                 with dpg.group(
                     horizontal=True, tag="channel_choose", show=False
                 ):
@@ -160,6 +162,7 @@ def _add_command_central(context: Context):
                         callback=toggle_active_channels,
                         user_data=context, show=False
                     )
+                dpg.add_spacer(height=5)
                 with dpg.group(tag="func_choose", show=False):
                     dpg.add_button(
                         label="Show Squiggle Plot",
@@ -176,12 +179,6 @@ def _add_command_central(context: Context):
                 dpg.add_spacer(height=5)
                 dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
                 dpg.add_spacer(height=5)
-                dpg.add_button(
-                    label="Save Experiments and Quit",
-                    callback=_save_and_quit, user_data=context
-                )
-
-                dpg.add_spacer(height=10)
                 with dpg.group(tag="exp_info", horizontal=True, show=False):
                     with dpg.group(tag="general_info"):
                         with dpg.group(horizontal=True):
@@ -216,6 +213,11 @@ def _add_command_central(context: Context):
                         with dpg.group(horizontal=True):
                             dpg.add_text("Zeroes density:")
                             dpg.add_text(tag="sel_zeroes_info")
+                dpg.add_spacer(height=10)
+                dpg.add_button(
+                    label="Save Experiments and Quit",
+                    callback=_save_and_quit, user_data=context
+                )
 
 
 def _save_and_quit(
