@@ -142,6 +142,7 @@ def show_rand_kde(
 
     if len(active_chans) > 11:
         chans = random.sample(active_chans, k=10)
+        chans.sort()
     else:
         chans = active_chans
 
