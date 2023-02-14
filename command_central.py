@@ -112,10 +112,10 @@ def toggle_active_channels(
 
 # ################ Setup functions ############################################
 # TODO: build OO interface for sounder intialization
-def _add_file_dialog(context: Context):
+def _add_file_dialog(dialog_tag: DpgItem, context: Context):
     with dpg.file_dialog(
         directory_selector=False, show=False, callback=choose_file,
-        user_data=context, id="file_dialog", width=500, height=400
+        user_data=context, id=dialog_tag, width=500, height=400
     ):
         dpg.add_file_extension(".*")
         dpg.add_file_extension(
@@ -123,88 +123,106 @@ def _add_file_dialog(context: Context):
         )
 
 
+def _add_file_select(context: Context):
+    _add_file_dialog("file_dialog", context)
+
+    with dpg.group(horizontal=True,):
+        dpg.add_button(
+            label="File Selector",
+            callback=lambda: dpg.show_item("file_dialog")
+        )
+        dpg.add_text(tag="filename", show=False)
+
+
+def _add_channel_choose(context: Context):
+    with dpg.group(
+        horizontal=True, tag="channel_choose", show=False
+    ):
+        dpg.add_text("Channel:")
+        dpg.add_combo(
+            tag="channel", width=60,
+            callback=set_channel,
+            user_data=context
+            )
+        dpg.add_button(
+            label="Get Active Channels",
+            tag="get_active_channels",
+            callback=set_active_channels,
+            user_data=context, show=False
+        )
+        dpg.add_checkbox(
+            label="Show All Channels",
+            tag='toggle_channels',
+            callback=toggle_active_channels,
+            user_data=context, show=False
+        )
+
+
+def _add_func_choose(context: Context):
+    with dpg.group(tag="func_choose", show=False):
+        dpg.add_button(
+            label="Show Squiggle Plot",
+            callback=show_raw, user_data=context
+        )
+        dpg.add_button(
+            label="Show Density Plot",
+            callback=show_kde, user_data=context
+        )
+        dpg.add_button(
+            label="Show Random Densities",
+            callback=show_rand_kde, user_data=context
+        )
+
+
+def _add_exp_info(context: Context):
+    with dpg.group(tag="exp_info", horizontal=True, show=False):
+        with dpg.group(tag="general_info"):
+            with dpg.group(horizontal=True):
+                dpg.add_text("Active channels:")
+                dpg.add_text(tag="active_channels_info")
+            with dpg.group(horizontal=True):
+                dpg.add_text("Avg event density:")
+                with dpg.tooltip(dpg.last_item()):
+                    dpg.add_text("[mean (+/- 2*sd)]")
+                dpg.add_text(tag="avg_event_info")
+            with dpg.group(horizontal=True):
+                dpg.add_text("Avg Baseline:")
+                with dpg.tooltip(dpg.last_item()):
+                    dpg.add_text("[mean (+/- 2*sd)]")
+                dpg.add_text(tag="avg_baseline_info")
+            with dpg.group(horizontal=True):
+                dpg.add_text("Concentration:")
+                dpg.add_text(tag="concentration_info")
+        with dpg.group(tag="channel_info", show=False):
+            with dpg.group(horizontal=True):
+                dpg.add_text("Selected channel:")
+                dpg.add_text(tag="sel_channel_info")
+            with dpg.group(horizontal=True):
+                dpg.add_text("Event density:")
+                dpg.add_text(tag="sel_event_info")
+            with dpg.group(horizontal=True):
+                dpg.add_text("Baseline: ")
+                dpg.add_text(tag="sel_baseline_info")
+            with dpg.group(horizontal=True):
+                dpg.add_text("Baseline density:")
+                dpg.add_text(tag="sel_baseline_density_info")
+            with dpg.group(horizontal=True):
+                dpg.add_text("Zeroes density:")
+                dpg.add_text(tag="sel_zeroes_info")
+
+
 def add_command_central(tab_tag: DpgItem, context: Context):
     with dpg.tab(label="Command Central", parent=tab_tag):
         dpg.add_spacer(height=5)
-        with dpg.group(horizontal=True):
-            dpg.add_button(
-                label="File Selector",
-                callback=lambda: dpg.show_item("file_dialog")
-            )
-            dpg.add_text(tag="filename", show=False)
+        _add_file_select(context)
         dpg.add_spacer(height=10)
-        with dpg.group(
-            horizontal=True, tag="channel_choose", show=False
-        ):
-            dpg.add_text("Channel:")
-            dpg.add_combo(
-                tag="channel", width=60,
-                callback=set_channel,
-                user_data=context
-                )
-            dpg.add_button(
-                label="Get Active Channels",
-                tag="get_active_channels",
-                callback=set_active_channels,
-                user_data=context, show=False
-            )
-            dpg.add_checkbox(
-                label="Show All Channels",
-                tag='toggle_channels',
-                callback=toggle_active_channels,
-                user_data=context, show=False
-            )
+        _add_channel_choose(context)
         dpg.add_spacer(height=5)
-        with dpg.group(tag="func_choose", show=False):
-            dpg.add_button(
-                label="Show Squiggle Plot",
-                callback=show_raw, user_data=context
-            )
-            dpg.add_button(
-                label="Show Density Plot",
-                callback=show_kde, user_data=context
-            )
-            dpg.add_button(
-                label="Show Random Densities",
-                callback=show_rand_kde, user_data=context
-            )
+        _add_func_choose(context)
         dpg.add_spacer(height=5)
         dpg.add_progress_bar(tag="Progress Bar", show=False, width=175)
         dpg.add_spacer(height=5)
-        with dpg.group(tag="exp_info", horizontal=True, show=False):
-            with dpg.group(tag="general_info"):
-                with dpg.group(horizontal=True):
-                    dpg.add_text("Active channels:")
-                    dpg.add_text(tag="active_channels_info")
-                with dpg.group(horizontal=True):
-                    dpg.add_text("Avg event density:")
-                    with dpg.tooltip(dpg.last_item()):
-                        dpg.add_text("[mean (+/- 2*sd)]")
-                    dpg.add_text(tag="avg_event_info")
-                with dpg.group(horizontal=True):
-                    dpg.add_text("Avg Baseline:")
-                    with dpg.tooltip(dpg.last_item()):
-                        dpg.add_text("[mean (+/- 2*sd)]")
-                    dpg.add_text(tag="avg_baseline_info")
-                with dpg.group(horizontal=True):
-                    dpg.add_text("Concentration:")
-                    dpg.add_text(tag="concentration_info")
-            with dpg.group(tag="channel_info", show=False):
-                with dpg.group(horizontal=True):
-                    dpg.add_text("Selected channel:")
-                    dpg.add_text(tag="sel_channel_info")
-                with dpg.group(horizontal=True):
-                    dpg.add_text("Event density:")
-                    dpg.add_text(tag="sel_event_info")
-                with dpg.group(horizontal=True):
-                    dpg.add_text("Baseline: ")
-                    dpg.add_text(tag="sel_baseline_info")
-                with dpg.group(horizontal=True):
-                    dpg.add_text("Baseline density:")
-                    dpg.add_text(tag="sel_baseline_density_info")
-                with dpg.group(horizontal=True):
-                    dpg.add_text("Zeroes density:")
-                    dpg.add_text(tag="sel_zeroes_info")
+        _add_exp_info(context)
         dpg.add_spacer(height=10)
         dpg.add_button(
             label="Save Experiments and Quit",
