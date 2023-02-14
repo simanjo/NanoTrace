@@ -135,12 +135,13 @@ def parse_exp_name(name):
             print(f"Couldn't determine concentration for {name}")
             conc = np.nan
         else:
-            concentration_str = match.group('conc')
-            expo = 3 if match.group('exp') == "mikro" else 1
-            if int(concentration_str[0]) == 0:
+            concentration_str = match.group('conc').replace(",",".")
+            expo = 3 if match.group('exp') == "mikro" else 0
+            if int(concentration_str[0]) == 0 and concentration_str[1] != ".":
+                # handle cases as "05mikromolar <-> 0.5 mikromolar"
                 conc = int(float("0." + concentration_str[1:])*(10**expo))
             else:
-                conc = int(concentration_str)*(10 ** expo)
+                conc = int(float(concentration_str)*(10 ** expo))
     except BaseException:
         print(f"Couldn't determine concentration for {name}")
         print(f"Having {match}")
