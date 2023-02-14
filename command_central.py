@@ -197,6 +197,8 @@ def choose_file(
 
 
 def _show_experiment_info(exp: Experiment) -> None:
+    if exp is None:
+        return
     dpg.set_value("active_channels_info", len(exp.get_active_channels()))
     mean, sd = exp.get_mean_events()
     dpg.set_value("avg_event_info", f"{mean} (+/-{2*sd})")
