@@ -13,6 +13,12 @@ def add_settings(tab_tag: DpgItem, context: Context):
     with dpg.tab(label="Settings", parent=tab_tag):
         dpg.add_spacer(height=5)
         _add_database_select(context)
+        _add_event_distribution_settings(context)
+    settings = context.settings
+    update_event_bands(
+        min_ev=settings.get('min_event_band', 0.27),
+        max_ev=settings.get('max_event_band', 0.48)
+    )
 
 
 # ################ Setup functions ############################################
@@ -41,6 +47,42 @@ def _add_database_select(context: Context):
     dpg.add_separator()
 
 
+def _add_event_distribution_settings(context: Context):
+    dpg.add_text("Event Band Settings:")
+    with dpg.group(horizontal=True):
+        # table like grouping, have labels in first group for auto alignment
+        with dpg.group():
+            dpg.add_text("Scale with Baseline:")
+            dpg.add_text("Lower event band bound:")
+            dpg.add_text("Upper event band bound:")
+        with dpg.group():
+            dpg.add_combo(
+                tag="bl_scaling",
+                items=["lower bound", "upper bound", "both", "none"],
+                default_value="both",
+                callback=select_bl_scaling, user_data=context
+            )
+            dpg.add_slider_float(
+                tag="min_event_float", clamped=True, max_value=1.0,
+                default_value=0.27, label="[1/100]",
+                callback=set_min_band, user_data=context
+            )
+            dpg.add_slider_int(
+                tag="min_event_int", show=False, max_value=350, label="[pA]",
+                callback=set_min_band, user_data=context
+            )
+            dpg.add_slider_float(
+                tag="max_event_float", clamped=True,
+                max_value=1.0, default_value=0.48, label="[1/100]",
+                callback=set_max_band, user_data=context
+            )
+            dpg.add_slider_int(
+                tag="max_event_int", show=False, max_value=350, label="[pA]",
+                callback=set_max_band, user_data=context
+            )
+    dpg.add_spacer(height=5)
+    dpg.add_separator()
+
 # ################ Callbacks ##################################################
 # TODO: build OO interface for sounder intialization
 
@@ -65,3 +107,107 @@ def choose_db(
     )
 
 
+def update_event_bands(
+    min_ev: Union[float, int], max_ev: Union[float, int], set_scale_combo=True
+):
+    scale = None
+    if isinstance(min_ev, int):
+        if isinstance(max_ev, int):
+            scale = "none"
+            dpg.configure_item("min_event_float", show=False)
+            dpg.configure_item("max_event_float", show=False)
+            dpg.configure_item(
+                "min_event_int", show=True, default_value=min_ev
+            )
+            dpg.configure_item(
+                "max_event_int", show=True, default_value=max_ev
+            )
+        else:
+            assert isinstance(max_ev, float)
+            scale = "upper bound"
+            dpg.configure_item("min_event_float", show=False)
+            dpg.configure_item(
+                "max_event_float", show=True, default_value=max_ev
+            )
+            dpg.configure_item(
+                "min_event_int", show=True, default_value=min_ev
+            )
+            dpg.configure_item("max_event_int", show=False)
+    elif isinstance(max_ev, int):
+        assert isinstance(min_ev, float)
+        scale = "lower bound"
+        dpg.configure_item(
+            "min_event_float", show=True, default_value=min_ev
+        )
+        dpg.configure_item("max_event_float", show=False)
+        dpg.configure_item("min_event_int", show=False)
+        dpg.configure_item("max_event_int", show=True, default_value=max_ev)
+    else:
+        assert isinstance(max_ev, float)
+        assert isinstance(min_ev, float)
+        scale = "both"
+        dpg.configure_item(
+            "min_event_float", show=True, default_value=min_ev
+        )
+        dpg.configure_item(
+            "max_event_float", show=True, default_value=max_ev
+        )
+        dpg.configure_item("min_event_int", show=False)
+        dpg.configure_item("max_event_int", show=False)
+    if set_scale_combo:
+        dpg.set_value("bl_scaling", scale)
+
+
+def select_bl_scaling(
+    sender: DpgItem,
+    app_data: Dict[str, Any],
+    user_data: Context
+) -> None:
+    scale = dpg.get_value(sender)
+    settings = user_data.settings
+    min_ev_set = settings.get('min_event_band', 0.27)
+    max_ev_set = settings.get('max_event_band', 0.48)
+    if scale == "none":
+        min_ev = min_ev_set if isinstance(min_ev_set, int) else 40
+        max_ev = max_ev_set if isinstance(max_ev_set, int) else 100
+    elif scale == "lower bound":
+        min_ev = min_ev_set if not isinstance(min_ev_set, int) else 0.27
+        max_ev = max_ev_set if isinstance(max_ev_set, int) else 100
+    elif scale == "upper bound":
+        min_ev = min_ev_set if isinstance(min_ev_set, int) else 40
+        max_ev = max_ev_set if not isinstance(max_ev_set, int) else 0.48
+    elif scale == "both":
+        min_ev = min_ev_set if not isinstance(min_ev_set, int) else 0.27
+        max_ev = max_ev_set if not isinstance(max_ev_set, int) else 0.48
+    else:
+        # should not happen
+        assert False
+    update_event_bands(min_ev, max_ev, set_scale_combo=False)
+
+
+def set_min_band(
+    sender: DpgItem,
+    app_data: Dict[str, Any],
+    user_data: Context
+) -> None:
+    # wait shortly and check whether the value has changed
+    min_ev = dpg.get_value(sender)
+    time.sleep(0.1)
+    if dpg.get_value(sender) == min_ev:
+        max_ev = user_data.settings.get('max_event_band', 0.48)
+        update_event_bands(min_ev, max_ev, set_scale_combo=False)
+        user_data.settings["min_event_band"] = min_ev
+
+
+def set_max_band(
+    sender: DpgItem,
+    app_data: Dict[str, Any],
+    user_data: Context
+) -> None:
+    # wait shortly and check whether the value has changed
+    max_ev = dpg.get_value(sender)
+    time.sleep(0.1)
+    if dpg.get_value(sender) == max_ev:
+        min_ev = user_data.settings.get('min_event_band', 0.27)
+        update_event_bands(min_ev, max_ev, set_scale_combo=False)
+        user_data.settings["max_event_band"] = max_ev

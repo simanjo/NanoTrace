@@ -12,7 +12,9 @@ from python_toolbox.util import get_file_hash
 # HACK
 DEFAULT_SETTINGS = {
     'kde_resolution': 1_000_000,
-    'burnin': 350_000
+    'burnin': 350_000,
+    'min_event_band': 0.27,
+    'max_event_band': 0.48,
 }
 
 DpgItem = Union[int, str]
