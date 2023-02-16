@@ -135,7 +135,7 @@ def parse_exp_name(name):
             print(f"Couldn't determine concentration for {name}")
             conc = np.nan
         else:
-            concentration_str = match.group('conc').replace(",",".")
+            concentration_str = match.group('conc').replace(",", ".")
             expo = 3 if match.group('exp') == "mikro" else 0
             if int(concentration_str[0]) == 0 and concentration_str[1] != ".":
                 # handle cases as "05mikromolar <-> 0.5 mikromolar"
@@ -148,30 +148,11 @@ def parse_exp_name(name):
     finally:
         properties["concentration"] = conc
 
-    if "ochratoxin" in name.lower():
-        properties["hplc"] = False
-        properties["special_run"] = False
-        properties["buffer"] = False
-        return properties
-
     if "buffer" in name.lower():
         properties["buffer"] = True
-        properties["hplc"] = False
-        properties["special_run"] = False
         properties["concentration"] = 0
         return properties
     else:
         properties["buffer"] = False
-
-    if "hplc" in name.lower():
-        properties["hplc"] = True
-    else:
-        properties["hplc"] = False
-
-    special_names = ["glycerol", "polya", "150mv", "denatured", "strepdavidin"]
-    if any(part in name.lower() for part in special_names):
-        properties["special_run"] = True
-    else:
-        properties["special_run"] = False
 
     return properties
