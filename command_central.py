@@ -140,7 +140,7 @@ def _add_exp_info(context: Context):
                 dpg.add_text(tag="sel_zeroes_info")
 
 
-# ################ Callbacks ############################################
+# ################ Callbacks ##################################################
 # TODO: build OO interface for sounder intialization
 
 
