@@ -46,7 +46,7 @@ def _get_main_dir():
 def main():
     dpg.create_context()
 
-    context = Context(cwd=_get_main_dir())
+    context = Context(experiment_db=_get_main_dir() / "experiment.db")
 
     _setup_app("main_window", "main_tab_bar", context)
     _start_app("main_window")

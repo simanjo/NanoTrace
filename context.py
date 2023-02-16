@@ -21,15 +21,20 @@ DpgItem = Union[int, str]
 class Context:
 
     def __init__(
-        self, cwd, settings=DEFAULT_SETTINGS
+        self, experiment_db, settings=DEFAULT_SETTINGS
     ) -> None:
 
         self.settings: Dict[str, Any] = settings
-        self.cwd = cwd
+        self.experiment_db = experiment_db
 
-        exps = self._load_exps()
-        self.exps: Dict[str, Experiment] = exps
+        self.exps: Dict[str, Experiment] = self._load_exps()
         self.active_exp: Optional[Experiment] = None
+
+    def update_experiment_db(self, fpath: str, dump_first=True) -> None:
+        if dump_first:
+            self._dump_exps()
+        self.experiment_db = fpath
+        self.exps, self.settings = self._load_exps()
 
     def update_context(
         self, fpath: str,
@@ -67,23 +72,28 @@ class Context:
         return chans
 
     def _load_exps(self) -> Dict[str, Experiment]:
-        if not (exp_db := (Path(self.cwd) / "experiments.db")).is_file():
+        if not Path(self.experiment_db).is_file():
             return {}
 
-        with open(exp_db, 'rb') as fh:
+        with open(self.experiment_db, 'rb') as fh:
             exp_dict = pickle.load(fh)
         return self._sanitize_exps(exp_dict)
 
     def _sanitize_exps(self, exp_dict) -> Dict[str, Experiment]:
         # TODO: add version tag and version check
         # and reasoning about settings
-        return exp_dict['exps']
+        experiments = {}
+        settings = self.settings
+        try:
+            experiments = exp_dict['exps']
+            settings = exp_dict['settings']
+        finally:
+            return experiments, settings
 
-    def _dump_exps(self, cwd: str = None) -> None:
+    def _dump_exps(self) -> None:
         dump = {
             'settings': self.settings,
             'exps': self.exps
         }
-        cwd = self.cwd if cwd is None else cwd
-        with open(Path(cwd) / "experiments.db", 'wb') as fh:
+        with open(self.experiment_db, 'wb') as fh:
             pickle.dump(dump, fh)
