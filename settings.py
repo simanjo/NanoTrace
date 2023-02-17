@@ -64,7 +64,7 @@ def _add_event_distribution_settings(context: Context):
             )
             dpg.add_slider_float(
                 tag="min_event_float", clamped=True, max_value=1.0,
-                default_value=0.27, label="[1/100]",
+                default_value=0.27, label="[1/100]", format='%.2f',
                 callback=set_min_band, user_data=context
             )
             dpg.add_slider_int(
@@ -74,7 +74,7 @@ def _add_event_distribution_settings(context: Context):
             dpg.add_slider_float(
                 tag="max_event_float", clamped=True,
                 max_value=1.0, default_value=0.48, label="[1/100]",
-                callback=set_max_band, user_data=context
+                callback=set_max_band, user_data=context, format='%.2f'
             )
             dpg.add_slider_int(
                 tag="max_event_int", show=False, max_value=350, label="[pA]",
