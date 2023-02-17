@@ -7,7 +7,7 @@ import dearpygui.dearpygui as dpg
 
 from experiment import Experiment
 import utils
-from python_toolbox.util import get_file_hash
+from python_toolbox.util import deep_update, get_file_hash
 
 # HACK
 DEFAULT_SETTINGS = {
@@ -76,7 +76,10 @@ class Context:
                 self.settings['max_event_band']
             )
             chans = list(details.keys())
-            self.active_exp.band_distribution = details
+            self.active_exp.band_distribution = deep_update(
+                self.active_exp.band_distribution,
+                details
+            )
         return chans
 
     def _load_exps(self) -> Dict[str, Experiment]:
