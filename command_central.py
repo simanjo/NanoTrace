@@ -211,6 +211,7 @@ def choose_file(
             dpg.configure_item("get_band_distributions", show=True)
     else:
         dpg.configure_item("channel", items=list(range(1, 127)))
+        dpg.configure_item("toggle_channels", show=False)
         dpg.configure_item("get_active_channels", show=True)
 
 
