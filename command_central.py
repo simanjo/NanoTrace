@@ -11,7 +11,7 @@ DpgItem = Union[int, str]
 
 
 def add_command_central(tab_tag: DpgItem, context: Context):
-    with dpg.tab(label="Command Central", parent=tab_tag):
+    with dpg.tab(label="Command Central", parent=tab_tag) as tab:
         dpg.add_spacer(height=5)
         _add_file_select(context)
         dpg.add_spacer(height=10)
@@ -27,6 +27,7 @@ def add_command_central(tab_tag: DpgItem, context: Context):
             label="Save Experiments and Quit",
             callback=_save_and_quit, user_data=context
         )
+    return tab
 
 
 def _save_and_quit(

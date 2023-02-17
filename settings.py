@@ -21,6 +21,14 @@ def add_settings(tab_tag: DpgItem, context: Context):
     )
 
 
+def add_changed_settings_handler(tab_tag: DpgItem, context: Context):
+    with dpg.item_handler_registry() as handler:
+        dpg.add_item_clicked_handler(
+            callback=update_context_with_settings,
+            user_data=context)
+    dpg.bind_item_handler_registry(tab_tag, handler)
+
+
 # ################ Setup functions ############################################
 # TODO: build OO interface for sounder intialization
 def _add_database_dialog(dialog_tag: DpgItem, context: Context):

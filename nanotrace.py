@@ -7,7 +7,7 @@ import dearpygui.dearpygui as dpg
 from context import Context
 from themes import custom_theme
 from command_central import add_command_central
-from settings import add_settings
+from settings import add_settings, add_changed_settings_handler
 
 DpgItem = Union[int, str]
 
@@ -25,8 +25,9 @@ def _start_app(window_tag: DpgItem):
 
 def _setup_app(window_tag: DpgItem, tab_tag: DpgItem, context: Context):
     _add_main_window("main_window", "main_tab_bar")
-    add_command_central("main_tab_bar", context)
+    cmd_tab = add_command_central("main_tab_bar", context)
     add_settings("main_tab_bar", context)
+    add_changed_settings_handler(cmd_tab, context)
 
 
 def _add_main_window(window_tag: DpgItem, tab_tag: DpgItem):
