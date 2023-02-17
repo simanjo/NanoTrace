@@ -12,6 +12,13 @@ from settings import add_settings, add_changed_settings_handler
 DpgItem = Union[int, str]
 
 
+def _setup_app(window_tag: DpgItem, tab_tag: DpgItem, context: Context):
+    _add_main_window(window_tag, tab_tag)
+    cmd_tab = add_command_central(tab_tag, context)
+    add_settings(tab_tag, context)
+    add_changed_settings_handler(cmd_tab, context)
+
+
 def _start_app(window_tag: DpgItem):
     dpg.bind_theme(custom_theme())
 
@@ -21,13 +28,6 @@ def _start_app(window_tag: DpgItem):
     dpg.show_viewport()
     dpg.set_primary_window(window_tag, True)
     dpg.start_dearpygui()
-
-
-def _setup_app(window_tag: DpgItem, tab_tag: DpgItem, context: Context):
-    _add_main_window("main_window", "main_tab_bar")
-    cmd_tab = add_command_central("main_tab_bar", context)
-    add_settings("main_tab_bar", context)
-    add_changed_settings_handler(cmd_tab, context)
 
 
 def _add_main_window(window_tag: DpgItem, tab_tag: DpgItem):
