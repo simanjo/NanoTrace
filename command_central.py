@@ -158,9 +158,11 @@ def set_active_channels(
     # first thing to happen: button vanishes
     dpg.configure_item("get_active_channels", show=False)
     user_data.calculate_band_distributions()
-    dpg.configure_item("channel", items=user_data.get_active_channels())
-    dpg.configure_item("func_choose", show=True)
+    dpg.configure_item(
+        "channel", items=user_data.get_active_channels(), show=True
+    )
     dpg.configure_item("toggle_channels", show=True)
+    dpg.configure_item("func_choose", show=True)
     _show_experiment_info(user_data)
 
 
@@ -202,7 +204,7 @@ def choose_file(
     dpg.set_value("channel", "")
 
     if (chans := user_data.get_active_channels()) is not None:
-        dpg.configure_item("channel", items=chans)
+        dpg.configure_item("channel", items=chans, show=True)
         dpg.configure_item("toggle_channels", show=True)
         dpg.configure_item("func_choose", show=True)
         if user_data.has_band_distribution():
