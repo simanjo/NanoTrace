@@ -182,6 +182,8 @@ def select_bl_scaling(
     else:
         # should not happen
         assert False
+    settings['min_event_band'] = min_ev
+    settings['max_event_band'] = max_ev
     update_event_bands(min_ev, max_ev, set_scale_combo=False)
 
 
