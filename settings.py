@@ -5,10 +5,8 @@ import time
 import dearpygui.dearpygui as dpg
 from command_central import _show_experiment_info
 
-from python_toolbox.util import deep_update
-
 from context import Context
-from utils import determine_scaling, get_channel_details
+from utils import determine_scaling
 
 DpgItem = Union[int, str]
 
@@ -243,28 +241,30 @@ def update_context_with_settings(
     max_ev = user_data.settings['max_event_band']
     scaling = determine_scaling(min_ev, max_ev)
     bands = user_data.active_exp.band_distribution
-    recompute = True
-    try:
-        if (min_ev, max_ev) in next(iter(bands.values()))[scaling].keys():
-            recompute = False
-    except (KeyError, StopIteration):
-        # KeyError stems from scaling missing as key
-        # StopIteration stems from empty bands dict
-        pass
+    if bands == {}:
+        recompute = True
+    else:
+        try:
+            if (min_ev, max_ev) in next(iter(bands.values()))[scaling].keys():
+                recompute = False
+        except (KeyError, StopIteration):
+            # KeyError stems from scaling missing as key
+            # StopIteration stems from empty bands dict
+            pass
     if recompute:
         dpg.configure_item("func_choose", show=False)
-        dpg.configure_item("channel_choose", show=False)
         dpg.configure_item("exp_info", show=False)
-        details = get_channel_details(
-            user_data.active_exp.path,
-            user_data.settings['burnin'],
-            min_ev, max_ev
-            )
-        user_data.active_exp.band_distribution = deep_update(
-            user_data.active_exp.band_distribution, details
-        )
-        dpg.configure_item("func_choose", show=True)
         dpg.configure_item("channel_choose", show=True)
-        dpg.configure_item("toggle_channels", show=True)
-    _show_experiment_info(user_data)
+        if (chans := user_data.get_active_channels()) is not None:
+            dpg.configure_item("channel", items=chans)
+            dpg.configure_item("toggle_channels", show=True)
+            dpg.configure_item("func_choose", show=True)
+            if user_data.has_band_distribution():
+                _show_experiment_info(user_data)
+            else:
+                dpg.configure_item("get_band_distributions", show=True)
+        else:
+            dpg.configure_item("channel", items=list(range(1, 127)))
+            dpg.configure_item("toggle_channels", show=False)
+            dpg.configure_item("get_active_channels", show=True)
     user_data.dirty = False
