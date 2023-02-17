@@ -4,7 +4,6 @@ import dearpygui.dearpygui as dpg
 
 from context import Context
 from python_toolbox.util import split_string_to_size
-from experiment import Experiment
 from series_plots import show_kde, show_rand_kde, show_raw
 from utils import event_density, determine_scaling
 
@@ -154,7 +153,7 @@ def set_active_channels(
     dpg.configure_item("channel", items=user_data.get_active_channels())
     dpg.configure_item("func_choose", show=True)
     dpg.configure_item("toggle_channels", show=True)
-    _show_experiment_info(user_data.active_exp)
+    _show_experiment_info(user_data)
 
 
 def choose_file(
@@ -186,18 +185,22 @@ def choose_file(
     dpg.configure_item("channel_choose", show=True)
     dpg.set_value("channel", "")
 
-    if (chans := user_data.active_exp.get_active_channels()) is not None:
+    if (chans := user_data.active_exp.get_active_channels()) is not None \
+            and user_data.active_exp.get_mean_events(
+                user_data.settings['min_event_band'],
+                user_data.settings['max_event_band']
+            ) is not None:
         dpg.configure_item("channel", items=chans)
         dpg.configure_item("toggle_channels", show=True)
         dpg.configure_item("func_choose", show=True)
-        _show_experiment_info(user_data.active_exp)
+        _show_experiment_info(user_data)
     else:
         dpg.configure_item("channel", items=list(range(1, 127)))
         dpg.configure_item("get_active_channels", show=True)
 
 
-def _show_experiment_info(exp: Experiment) -> None:
-    if exp is None:
+def _show_experiment_info(context: Context) -> None:
+    if (exp := context.active_exp) is None:
         return
     ev_low = context.settings['min_event_band']
     ev_high = context.settings['max_event_band']
