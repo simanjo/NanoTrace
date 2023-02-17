@@ -184,6 +184,7 @@ def select_bl_scaling(
         assert False
     settings['min_event_band'] = min_ev
     settings['max_event_band'] = max_ev
+    user_data.dirty = True
     update_event_bands(min_ev, max_ev, set_scale_combo=False)
 
 
@@ -199,6 +200,7 @@ def set_min_band(
         max_ev = user_data.settings.get('max_event_band', 0.48)
         update_event_bands(min_ev, max_ev, set_scale_combo=False)
         user_data.settings["min_event_band"] = min_ev
+        user_data.dirty = True
 
 
 def set_max_band(
@@ -213,3 +215,4 @@ def set_max_band(
         min_ev = user_data.settings.get('min_event_band', 0.27)
         update_event_bands(min_ev, max_ev, set_scale_combo=False)
         user_data.settings["max_event_band"] = max_ev
+        user_data.dirty = True

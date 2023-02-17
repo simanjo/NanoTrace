@@ -32,11 +32,15 @@ class Context:
         self.exps: Dict[str, Experiment] = self._load_exps()[0]
         self.active_exp: Optional[Experiment] = None
 
+        # flag to determine changed settings for recomputation of bands
+        self.dirty = False
+
     def update_experiment_db(self, fpath: str, dump_first=True) -> None:
         if dump_first:
             self._dump_exps()
         self.experiment_db = fpath
         self.exps, self.settings = self._load_exps()
+        self.dirty = True
 
     def update_context(
         self, fpath: str,
@@ -67,7 +71,9 @@ class Context:
         if (chans := self.active_exp.get_active_channels()) is None:
             details = utils.get_channel_details(
                 self.active_exp.path,
-                DEFAULT_SETTINGS['burnin']
+                self.settings['burnin'],
+                self.settings['min_event_band'],
+                self.settings['max_event_band']
             )
             chans = list(details.keys())
             self.active_exp.band_distribution = details
