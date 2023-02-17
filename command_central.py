@@ -6,7 +6,7 @@ from context import Context
 from python_toolbox.util import split_string_to_size
 from experiment import Experiment
 from series_plots import show_kde, show_rand_kde, show_raw
-from utils import event_density
+from utils import event_density, determine_scaling
 
 DpgItem = Union[int, str]
 
@@ -199,10 +199,12 @@ def choose_file(
 def _show_experiment_info(exp: Experiment) -> None:
     if exp is None:
         return
+    ev_low = context.settings['min_event_band']
+    ev_high = context.settings['max_event_band']
     dpg.set_value("active_channels_info", len(exp.get_active_channels()))
-    mean, sd = exp.get_mean_events()
+    mean, sd = exp.get_mean_events(ev_low, ev_high)
     dpg.set_value("avg_event_info", f"{mean} (+/-{2*sd})")
-    mean_bl, sd_bl = exp.get_mean_baselines()
+    mean_bl, sd_bl = exp.get_mean_baselines(ev_low, ev_high)
     dpg.set_value("avg_baseline_info", f"{mean_bl} (+/-{2*sd_bl})")
     dpg.set_value("concentration_info", exp.properties['concentration'])
     dpg.configure_item("exp_info", show=True)
@@ -215,10 +217,13 @@ def set_channel(
 ) -> None:
     channel = int(dpg.get_value(sender))
     try:
-        bl, band = user_data.active_exp.band_distribution[channel]
+        band_dict = user_data.active_exp.band_distribution[channel]
     except KeyError:
         dpg.configure_item("channel_info", show=False)
         return
+    ev_low = user_data.settings['min_event_band']
+    ev_high = user_data.settings['max_event_band']
+    bl, band = band_dict[determine_scaling(ev_low, ev_high)][(ev_low, ev_high)]
 
     dpg.set_value("sel_channel_info", channel)
     dpg.set_value("sel_event_info", round(event_density(band), 4))
