@@ -247,9 +247,12 @@ def update_context_with_settings(
         try:
             if (min_ev, max_ev) in next(iter(bands.values()))[scaling].keys():
                 recompute = False
+            else:
+                recompute = True
         except (KeyError, StopIteration):
             # KeyError stems from scaling missing as key
             # StopIteration stems from empty bands dict
+            recompute = True
             pass
     if recompute:
         dpg.configure_item("func_choose", show=False)

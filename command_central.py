@@ -249,7 +249,13 @@ def set_channel(
 
     ev_low = user_data.settings['min_event_band']
     ev_high = user_data.settings['max_event_band']
-    bl, band = band_dict[determine_scaling(ev_low, ev_high)][(ev_low, ev_high)]
+    try:
+        bl, band = band_dict[
+            determine_scaling(ev_low, ev_high)
+        ][(ev_low, ev_high)]
+    except KeyError:
+        dpg.configure_item("channel_info", show=False)
+        return
 
     dpg.set_value("sel_channel_info", channel)
     dpg.set_value("sel_event_info", round(event_density(band), 4))
