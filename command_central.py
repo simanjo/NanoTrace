@@ -79,6 +79,12 @@ def _add_channel_choose(context: Context):
             callback=set_active_channels,
             user_data=context, show=False
         )
+        dpg.add_button(
+            label="Calculate Event Bands",
+            tag="get_band_distributions",
+            callback=get_band_distributions,
+            user_data=context, show=False
+        )
         dpg.add_checkbox(
             label="Show All Channels",
             tag='toggle_channels',
@@ -151,9 +157,21 @@ def set_active_channels(
 ) -> None:
     # first thing to happen: button vanishes
     dpg.configure_item("get_active_channels", show=False)
+    user_data.calculate_band_distributions()
     dpg.configure_item("channel", items=user_data.get_active_channels())
     dpg.configure_item("func_choose", show=True)
     dpg.configure_item("toggle_channels", show=True)
+    _show_experiment_info(user_data)
+
+
+def get_band_distributions(
+    sender: DpgItem,
+    app_data: Any,
+    user_data: Context
+) -> None:
+    # first thing to happen: button vanishes
+    dpg.configure_item("get_band_distributions", show=False)
+    user_data.calculate_band_distributions()
     _show_experiment_info(user_data)
 
 
@@ -183,15 +201,14 @@ def choose_file(
     dpg.configure_item("channel_choose", show=True)
     dpg.set_value("channel", "")
 
-    if (chans := user_data.active_exp.get_active_channels()) is not None \
-            and user_data.active_exp.get_mean_events(
-                user_data.settings['min_event_band'],
-                user_data.settings['max_event_band']
-            ) is not None:
+    if (chans := user_data.get_active_channels()) is not None:
         dpg.configure_item("channel", items=chans)
         dpg.configure_item("toggle_channels", show=True)
         dpg.configure_item("func_choose", show=True)
-        _show_experiment_info(user_data)
+        if user_data.has_band_distribution():
+            _show_experiment_info(user_data)
+        else:
+            dpg.configure_item("get_band_distributions", show=True)
     else:
         dpg.configure_item("channel", items=list(range(1, 127)))
         dpg.configure_item("get_active_channels", show=True)

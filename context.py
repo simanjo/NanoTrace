@@ -68,19 +68,32 @@ class Context:
         self.active_exp = exp
 
     def get_active_channels(self) -> List[int]:
-        if (chans := self.active_exp.get_active_channels()) is None:
+        return self.active_exp.get_active_channels()
+
+    def has_band_distribution(self) -> bool:
+        if (bands := self.active_exp) is None:
+            return False
+        min_ev = self.settings['min_event_band']
+        max_ev = self.settings['max_event_band']
+        scaling = utils.determine_scaling(min_ev, max_ev)
+        try:
+            if (min_ev, max_ev) in next(iter(bands.values()))[scaling].keys():
+                return True
+        except (KeyError, StopIteration):
+            return False
+
+    def calculate_band_distributions(self) -> List[int]:
+        if not self.has_band_distribution():
             details = utils.get_channel_details(
                 self.active_exp.path,
                 self.settings['burnin'],
                 self.settings['min_event_band'],
                 self.settings['max_event_band']
             )
-            chans = list(details.keys())
             self.active_exp.band_distribution = deep_update(
                 self.active_exp.band_distribution,
                 details
             )
-        return chans
 
     def _load_exps(self) -> Dict[str, Experiment]:
         if not Path(self.experiment_db).is_file():
