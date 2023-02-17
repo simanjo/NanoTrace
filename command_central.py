@@ -234,13 +234,16 @@ def set_channel(
     user_data: Context
 ) -> None:
     channel = int(dpg.get_value(sender))
+    if user_data.active_exp.band_distribution is None:
+        dpg.set_value("channel", "")
+        return
     try:
-        if user_data.active_exp.band_distribution is None:
-            return
         band_dict = user_data.active_exp.band_distribution[channel]
     except KeyError:
+        dpg.set_value("channel", "")
         dpg.configure_item("channel_info", show=False)
         return
+
     ev_low = user_data.settings['min_event_band']
     ev_high = user_data.settings['max_event_band']
     bl, band = band_dict[determine_scaling(ev_low, ev_high)][(ev_low, ev_high)]
