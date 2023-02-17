@@ -8,7 +8,7 @@ from utils import event_density, determine_scaling
 class Experiment:
 
     def __init__(
-        self, fname, fpath, hashs, properties, band_distribution=None
+        self, fname, fpath, hashs, properties, band_distribution={}
     ) -> None:
         self.name: str = fname
         self.path: str = fpath
@@ -38,7 +38,7 @@ class Experiment:
         )
 
     def get_active_channels(self):
-        if self.band_distribution is None:
+        if self.band_distribution == {}:
             return None
         return list(self.band_distribution.keys())
 
@@ -46,7 +46,7 @@ class Experiment:
         self, event_low: Union[float, int],
         event_high: Union[float, int], filter_mad: bool = True
     ):
-        if self.band_distribution is None:
+        if self.band_distribution == {}:
             return None
 
         scaling = determine_scaling(event_low, event_high)
@@ -70,7 +70,7 @@ class Experiment:
         self, event_low: Union[float, int],
         event_high: Union[float, int], filter_mad=True
     ):
-        if self.band_distribution is None:
+        if self.band_distribution == {}:
             return None
 
         scaling = determine_scaling(event_low, event_high)

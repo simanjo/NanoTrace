@@ -234,7 +234,7 @@ def set_channel(
     user_data: Context
 ) -> None:
     channel = int(dpg.get_value(sender))
-    if user_data.active_exp.band_distribution is None:
+    if user_data.active_exp.band_distribution == {}:
         dpg.set_value("channel", "")
         return
     try:
