@@ -71,7 +71,7 @@ class Context:
         return self.active_exp.get_active_channels()
 
     def has_band_distribution(self) -> bool:
-        if (bands := self.active_exp) is None:
+        if (bands := self.active_exp.band_distribution) == {}:
             return False
         min_ev = self.settings['min_event_band']
         max_ev = self.settings['max_event_band']
