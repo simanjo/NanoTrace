@@ -29,7 +29,7 @@ class Context:
         self.settings: Dict[str, Any] = settings
         self.experiment_db = experiment_db
 
-        self.exps: Dict[str, Experiment] = self._load_exps()
+        self.exps: Dict[str, Experiment] = self._load_exps()[0]
         self.active_exp: Optional[Experiment] = None
 
     def update_experiment_db(self, fpath: str, dump_first=True) -> None:
@@ -75,7 +75,7 @@ class Context:
 
     def _load_exps(self) -> Dict[str, Experiment]:
         if not Path(self.experiment_db).is_file():
-            return {}
+            return ({}, {})
 
         with open(self.experiment_db, 'rb') as fh:
             exp_dict = pickle.load(fh)
