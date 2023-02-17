@@ -169,12 +169,9 @@ def choose_file(
 
     # TODO/HACK: invent state interface to allow for
     #            easier switching of displayed stuff
-    dpg.configure_item("get_active_channels", show=False)
-    dpg.configure_item("toggle_channels", show=False)
+    dpg.configure_item("channel_choose", show=False)
     dpg.configure_item("func_choose", show=False)
     dpg.configure_item("exp_info", show=False)
-    dpg.configure_item("channel_info", show=False)
-    dpg.configure_item("channel_choose", show=False)
     # reset filename first as file loading might take some time
     dpg.configure_item("filename", show=False)
     user_data.update_context(fpath, progressbar="Progress Bar")
