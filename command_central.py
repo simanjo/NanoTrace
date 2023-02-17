@@ -235,6 +235,8 @@ def set_channel(
 ) -> None:
     channel = int(dpg.get_value(sender))
     try:
+        if user_data.active_exp.band_distribution is None:
+            return
         band_dict = user_data.active_exp.band_distribution[channel]
     except KeyError:
         dpg.configure_item("channel_info", show=False)
