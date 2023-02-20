@@ -55,7 +55,7 @@ def _add_database_select(context: Context):
         )
         dpg.add_text(tag="exp_db_name", show=False)
     dpg.add_button(
-        "Save Experiments", tag="save_exps",
+        label="Save Experiments", tag="save_exps",
         callback=context._dump_exps(), show=False
     )
     dpg.add_spacer(height=5)
@@ -152,6 +152,7 @@ def choose_db(
         max_ev=settings.get('max_event_band', 0.48)
     )
     dpg.configure_item("save_exps", show=True)
+    dpg.configure_item("exit_button", label="Save Experiments and Quit")
 
 
 def update_event_bands(

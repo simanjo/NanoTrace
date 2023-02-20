@@ -24,7 +24,7 @@ def add_command_central(tab_tag: DpgItem, context: Context):
         _add_exp_info(context)
         dpg.add_spacer(height=10)
         dpg.add_button(
-            label="Save Experiments and Quit",
+            label="Quit", tag="exit_button",
             callback=_save_and_quit, user_data=context
         )
     return tab
