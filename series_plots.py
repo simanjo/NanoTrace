@@ -4,6 +4,7 @@ import random
 from typing import Literal, Union, Any, Collection, Sequence, List
 
 import dearpygui.dearpygui as dpg
+import numpy as np
 import statsmodels.api as sm
 
 from fast5_research.fast5_bulk import BulkFast5
@@ -78,16 +79,21 @@ def _get_series_data(
     channel_id = channels[0] if len(channels) == 1 else channels
     title = f"{context.active_exp.name}\nChannel {channel_id}"
     if flavour == "raw":
+
         # TODO: ensure that channels fits as type?
         # assert len(channels) == 1
         channel = channels[0]
+        x_axis_scale = 1.0
+        x_label = "index"
         with BulkFast5(fpath) as fh:
             y_data = [fh.get_raw(channel)]
-        x_label = "index"
-        x_lims = (0, 100_000)
+            if context.settings['scale_in_seconds']:
+                x_axis_scale = fh.sample_rate
+                x_label = "time [s]"
+        x_lims = (0, int(100_000/x_axis_scale))
         y_label = "current [pA]"
         y_lims = (-20, 350)
-        x_data = [list(range(0, len(y_data[0])))]
+        x_data = [np.arange(0, len(y_data[0])) / x_axis_scale]
     elif flavour == 'dens':
         kdes = _get_kdes(context, channels)
         x_data = [kde.support for kde in kdes]

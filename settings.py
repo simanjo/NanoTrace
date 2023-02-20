@@ -59,7 +59,9 @@ def _add_database_select(context: Context):
 
 
 def _add_event_distribution_settings(context: Context):
+    dpg.add_spacer(height=2)
     dpg.add_text("Event Band Settings:")
+    dpg.add_spacer(height=2)
     with dpg.group(horizontal=True):
         # table like grouping, have labels in first group for auto alignment
         with dpg.group():
@@ -102,8 +104,14 @@ def _add_plot_settings(context: Context):
     with dpg.group(horizontal=True):
         # table like grouping, have labels in first group for auto alignment
         with dpg.group():
+            dpg.add_text("x-axis labeling:")
             dpg.add_text("Random KDEs:")
         with dpg.group():
+            dpg.add_combo(
+                tag="axis_labeling", items=["datapoints", "seconds"],
+                default_value="datapoints",
+                callback=select_axis_labeling, user_data=context
+            )
             dpg.add_slider_int(
                 tag="random_kdes", clamped=True,
                 max_value=126, default_value=10,
@@ -298,3 +306,12 @@ def select_random_kdes(
     user_data: Context
 ) -> None:
     user_data.settings['random_kdes'] = dpg.get_value(sender)
+
+
+def select_axis_labeling(
+    sender: DpgItem,
+    app_data: Dict[str, Any],
+    user_data: Context
+) -> None:
+    user_data.settings['scale_in_seconds'] \
+        = (dpg.get_value(sender) == 'seconds')
