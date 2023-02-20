@@ -26,7 +26,7 @@ DpgItem = Union[int, str]
 class Context:
 
     def __init__(
-        self, experiment_db, settings=DEFAULT_SETTINGS
+        self, experiment_db=None, settings=DEFAULT_SETTINGS
     ) -> None:
 
         self.settings: Dict[str, Any] = settings
@@ -98,8 +98,9 @@ class Context:
                 details
             )
 
-    def _load_exps(self) -> Dict[str, Experiment]:
-        if not Path(self.experiment_db).is_file():
+    def _load_exps(self) -> Tuple[Dict[str, Experiment], Dict]:
+        if not self.experiment_db \
+                or not Path(self.experiment_db).is_file():
             return ({}, {})
 
         with open(self.experiment_db, 'rb') as fh:
@@ -123,8 +124,9 @@ class Context:
             'settings': self.settings,
             'exps': self.exps
         }
-        with open(self.experiment_db, 'wb') as fh:
-            pickle.dump(dump, fh)
+        if self.experiment_db:
+            with open(self.experiment_db, 'wb') as fh:
+                pickle.dump(dump, fh)
 
     def get_event_bands(self, channel) -> Tuple[float, float]:
         min_ev = self.settings['min_event_band']
