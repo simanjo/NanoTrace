@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional, Tuple, Union
 from os import path
 from pathlib import Path
 import pickle
@@ -121,3 +121,11 @@ class Context:
         }
         with open(self.experiment_db, 'wb') as fh:
             pickle.dump(dump, fh)
+
+    def get_event_bands(self, channel) -> Tuple[float, float]:
+        min_ev = self.settings['min_event_band']
+        max_ev = self.settings['max_event_band']
+        return utils._sanitize_event_bands(
+            utils.determine_scaling(min_ev, max_ev),
+            min_ev, max_ev, self.active_exp.get_baseline(channel)
+        )
