@@ -35,19 +35,12 @@ def _add_main_window(window_tag: DpgItem, tab_tag: DpgItem):
         dpg.add_tab_bar(tag=tab_tag)
 
 
-def _get_main_dir():
-    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        return Path(sys.executable).parent
-    else:
-        return Path(__file__).parent
-
-
 ##############################################################################
 
 def main():
     dpg.create_context()
 
-    context = Context(experiment_db=_get_main_dir() / "experiments.db")
+    context = Context()
 
     _setup_app("main_window", "main_tab_bar", context)
     _start_app("main_window")
