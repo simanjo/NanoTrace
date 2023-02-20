@@ -71,7 +71,7 @@ def _add_database_select(context: Context):
         dpg.add_text(tag="exp_db_name", show=False)
     dpg.add_button(
         label="Save Experiments", tag="save_exps",
-        callback=context._dump_exps(), show=False
+        callback=lambda: context._dump_exps(), show=False
     )
     dpg.add_spacer(height=5)
     dpg.add_separator()
