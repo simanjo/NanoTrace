@@ -138,10 +138,10 @@ def show_rand_kde(
     user_data: Context
 ) -> None:
     active_chans = user_data.get_active_channels()
-    assert active_chans
+    n = user_data.settings['random_kdes']
 
-    if len(active_chans) > 11:
-        chans = random.sample(active_chans, k=10)
+    if len(active_chans) > n + 1:
+        chans = random.sample(active_chans, k=n)
         chans.sort()
     else:
         chans = active_chans

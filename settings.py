@@ -16,6 +16,7 @@ def add_settings(tab_tag: DpgItem, context: Context):
         dpg.add_spacer(height=5)
         _add_database_select(context)
         _add_event_distribution_settings(context)
+        _add_plot_settings(context)
     settings = context.settings
     update_event_bands(
         min_ev=settings.get('min_event_band', 0.27),
@@ -89,6 +90,24 @@ def _add_event_distribution_settings(context: Context):
             dpg.add_slider_int(
                 tag="max_event_int", show=False, max_value=350, label="[pA]",
                 callback=set_max_band, user_data=context
+            )
+    dpg.add_spacer(height=5)
+    dpg.add_separator()
+
+
+def _add_plot_settings(context: Context):
+    dpg.add_spacer(height=2)
+    dpg.add_text("Plot Settings:")
+    dpg.add_spacer(height=2)
+    with dpg.group(horizontal=True):
+        # table like grouping, have labels in first group for auto alignment
+        with dpg.group():
+            dpg.add_text("Random KDEs:")
+        with dpg.group():
+            dpg.add_slider_int(
+                tag="random_kdes", clamped=True,
+                max_value=126, default_value=10,
+                callback=select_random_kdes, user_data=context
             )
     dpg.add_spacer(height=5)
     dpg.add_separator()
@@ -271,3 +290,11 @@ def update_context_with_settings(
             dpg.configure_item("toggle_channels", show=False)
             dpg.configure_item("get_active_channels", show=True)
     user_data.dirty = False
+
+
+def select_random_kdes(
+    sender: DpgItem,
+    app_data: Dict[str, Any],
+    user_data: Context
+) -> None:
+    user_data.settings['random_kdes'] = dpg.get_value(sender)

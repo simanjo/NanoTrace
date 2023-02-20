@@ -15,6 +15,7 @@ DEFAULT_SETTINGS = {
     'burnin': 350_000,
     'min_event_band': 0.27,
     'max_event_band': 0.48,
+    'random_kdes': 10
 }
 
 DpgItem = Union[int, str]
