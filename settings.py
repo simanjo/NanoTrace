@@ -191,6 +191,7 @@ def create_db(
     dpg.configure_item("save_exps", show=True)
     dpg.configure_item("exit_button", label="Save Experiments and Quit")
 
+
 def choose_db(
     sender: DpgItem,
     app_data: Dict[str, Any],
@@ -209,8 +210,22 @@ def choose_db(
         min_ev=settings.get('min_event_band', 0.27),
         max_ev=settings.get('max_event_band', 0.48)
     )
+    update_plot_settings(
+        settings.get('random_kdes', 10),
+        settings.get('scale_in_seconds', False),
+        settings.get('plot_event_bands', False)
+    )
     dpg.configure_item("save_exps", show=True)
     dpg.configure_item("exit_button", label="Save Experiments and Quit")
+
+
+def update_plot_settings(
+    random_kdes: int, scale: bool, show_bands: bool
+) -> None:
+    dpg.set_value("show_bands", show_bands)
+    axis_label = "seconds" if scale else "datapoints"
+    dpg.configure_item("axis_labeling", default_value=axis_label)
+    dpg.configure_item("random_kdes", default_value=random_kdes)
 
 
 def update_event_bands(
