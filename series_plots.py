@@ -114,7 +114,7 @@ def show_raw(
     if not (channel := dpg.get_value("channel")):
         # no channel set, fail silently, TODO: add handling ie message?
         return
-    series_data = _get_series_data(user_data, "raw", [channel])
+    series_data = _get_series_data(user_data, "raw", [int(channel)])
     target = dpg.add_window(label="Raw Data", width=800, height=600)
     _plot_series(target, series_data)
 
@@ -127,7 +127,7 @@ def show_kde(
     if not (channel := dpg.get_value("channel")):
         # no channel set, fail silently, TODO: add handling ie message?
         return
-    series_data = _get_series_data(user_data, "dens", [channel])
+    series_data = _get_series_data(user_data, "dens", [int(channel)])
     target = dpg.add_window(label="Kernel Density", width=800, height=600)
     _plot_series(target, series_data)
 
