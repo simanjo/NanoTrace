@@ -110,10 +110,11 @@ class Context:
         # TODO: add version tag and version check
         # and reasoning about settings
         experiments = {}
-        settings = self.settings
+        settings = DEFAULT_SETTINGS
         try:
             experiments = exp_dict['exps']
-            settings = exp_dict['settings']
+            if (new_settings := exp_dict['settings']):
+                settings = new_settings
         finally:
             return experiments, settings
 
