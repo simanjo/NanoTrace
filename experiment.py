@@ -1,4 +1,4 @@
-from typing import Any, Literal, Dict, Optional, Union
+from typing import Any, List, Literal, Dict, Optional, Tuple, Union
 
 from numpy import mean, median, std
 
@@ -37,7 +37,7 @@ class Experiment:
             ]
         )
 
-    def get_active_channels(self):
+    def get_active_channels(self) -> Optional[List[int]]:
         if self.band_distribution == {}:
             return None
         return list(self.band_distribution.keys())
@@ -45,7 +45,7 @@ class Experiment:
     def get_mean_baselines(
         self, event_low: Union[float, int],
         event_high: Union[float, int], filter_mad: bool = True
-    ):
+    ) -> Tuple[float, float]:
         if self.band_distribution == {}:
             return None
 
@@ -69,7 +69,7 @@ class Experiment:
     def get_mean_events(
         self, event_low: Union[float, int],
         event_high: Union[float, int], filter_mad=True
-    ):
+    ) -> Tuple[float, float]:
         if self.band_distribution == {}:
             return None
 
