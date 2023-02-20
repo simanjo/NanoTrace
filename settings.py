@@ -46,13 +46,28 @@ def _add_database_dialog(dialog_tag: DpgItem, context: Context):
 
 
 def _add_database_select(context: Context):
+    dpg.add_spacer(height=2)
+    dpg.add_text("Experiment Database:")
+    dpg.add_spacer(height=2)
     _add_database_dialog("db_dialog", context)
+    _add_database_create_dialog("db_create_dialog", context)
 
     with dpg.group(horizontal=True):
         dpg.add_button(
-            label="Select experiment database",
+            label="Create new Database",
+            callback=lambda: dpg.show_item("db_create_dialog")
+        )
+        dpg.add_spacer(width=11)
+        dpg.add_input_text(
+            tag="new_db_name",
+            hint="Enter db name here - defaults to 'experiments.db'"
+        )
+    with dpg.group(horizontal=True):
+        dpg.add_button(
+            label="Select Database",
             callback=lambda: dpg.show_item("db_dialog")
         )
+        dpg.add_spacer(width=40)
         dpg.add_text(tag="exp_db_name", show=False)
     dpg.add_button(
         label="Save Experiments", tag="save_exps",
@@ -60,6 +75,17 @@ def _add_database_select(context: Context):
     )
     dpg.add_spacer(height=5)
     dpg.add_separator()
+
+
+def _add_database_create_dialog(dialog_tag: DpgItem, context: Context):
+    with dpg.file_dialog(
+        directory_selector=True, show=False, callback=create_db,
+        user_data=context, id=dialog_tag, width=500, height=400
+    ):
+        dpg.add_file_extension(".*")
+        dpg.add_file_extension(
+            ".db", color=(0, 255, 255, 255), custom_text="[db]"
+        )
 
 
 def _add_event_distribution_settings(context: Context):
@@ -132,6 +158,38 @@ def _add_plot_settings(context: Context):
 # ################ Callbacks ##################################################
 # TODO: build OO interface for sounder intialization
 
+
+def create_db(
+    sender: DpgItem,
+    app_data: Dict[str, Any],
+    user_data: Context
+) -> None:
+    try:
+        fpath = Path(app_data['file_path_name'])
+    except KeyError:
+        return
+    name = dpg.get_value("new_db_name")
+    if not name:
+        name = "experiments.db"
+    if (exp_path := (fpath / name)).is_file():
+        with dpg.window(
+            modal=True, label="Error", autosize=True, no_close=True,
+            no_collapse=True, tag="error_window"
+        ):
+            dpg.add_text(
+                f"There already is a file at {exp_path}. \n" +
+                "Please choose a different name to store" +
+                "the intermediate results."
+            )
+            dpg.add_button(
+                label="Ok", callback=lambda: dpg.delete_item("error_window")
+            )
+        return
+    dpg.set_value("exp_db_name", exp_path)
+    dpg.configure_item("exp_db_name", show=True)
+    user_data.experiment_db = exp_path
+    dpg.configure_item("save_exps", show=True)
+    dpg.configure_item("exit_button", label="Save Experiments and Quit")
 
 def choose_db(
     sender: DpgItem,
