@@ -42,6 +42,16 @@ class Experiment:
             return None
         return list(self.band_distribution.keys())
 
+    def get_baseline(self, channel: int) -> Optional[int]:
+        baseline = None
+        try:
+            baseline = next(iter(
+                next(iter(self.band_distribution[channel].values())).values()
+            ))[0]
+        except (KeyError, StopIteration):
+            return None
+        return baseline
+
     def get_mean_baselines(
         self, event_low: Union[float, int],
         event_high: Union[float, int], filter_mad: bool = True
