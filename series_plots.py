@@ -1,7 +1,7 @@
 from argparse import ArgumentError
 from dataclasses import dataclass
 import random
-from typing import Literal, Union, Any, Collection, Sequence, List
+from typing import Literal, Optional, Union, Any, Collection, Sequence, List
 
 import dearpygui.dearpygui as dpg
 import numpy as np
@@ -26,6 +26,7 @@ class SeriesData:
     y_label: str
     y_lims: Sequence[float]
     y_datas: List[Collection[float]]
+    h_lines: Optional[Sequence[float]] = None
 
 
 def _plot_series(target: DpgItem, data: SeriesData) -> None:
@@ -41,6 +42,10 @@ def _plot_series(target: DpgItem, data: SeriesData) -> None:
         dpg.split_frame()
         dpg.set_axis_limits_auto(x_axis)
         dpg.set_axis_limits_auto(y_axis)
+        if data.h_lines:
+            dpg.add_hline_series(
+                [float(val) for val in data.h_lines], parent=y_axis
+            )
     dpg.configure_item(target, on_close=lambda: dpg.delete_item(plt))
 
 
@@ -78,6 +83,7 @@ def _get_series_data(
     fpath = context.active_exp.path
     channel_id = channels[0] if len(channels) == 1 else channels
     title = f"{context.active_exp.name}\nChannel {channel_id}"
+    h_lines = None
     if flavour == "raw":
 
         # TODO: ensure that channels fits as type?
@@ -95,11 +101,7 @@ def _get_series_data(
         y_lims = (-20, 350)
         x_data = [np.arange(0, len(y_data[0])) / x_axis_scale]
         if context.settings['plot_event_bands']:
-            low, high = context.get_event_bands(channel)
-            y_data.append([low]*len(y_data[0]))
-            y_data.append([high]*len(y_data[0]))
-            x_data.append(x_data[0])
-            x_data.append(x_data[0])
+            h_lines = context.get_event_bands(channel)
     elif flavour == 'dens':
         kdes = _get_kdes(context, channels)
         x_data = [kde.support for kde in kdes]
@@ -115,7 +117,9 @@ def _get_series_data(
             "Use \'raw\' or \'dens\'"
         ]
         raise ArgumentError(" ".join(msg))
-    return SeriesData(title, x_label, x_lims, x_data, y_label, y_lims, y_data)
+    return SeriesData(
+        title, x_label, x_lims, x_data, y_label, y_lims, y_data, h_lines
+    )
 
 
 def show_raw(
