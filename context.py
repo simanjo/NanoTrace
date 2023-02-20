@@ -16,7 +16,8 @@ DEFAULT_SETTINGS = {
     'min_event_band': 0.27,
     'max_event_band': 0.48,
     'random_kdes': 10,
-    'scale_in_seconds': False
+    'scale_in_seconds': False,
+    'plot_event_bands': False
 }
 
 DpgItem = Union[int, str]

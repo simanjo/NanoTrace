@@ -94,6 +94,12 @@ def _get_series_data(
         y_label = "current [pA]"
         y_lims = (-20, 350)
         x_data = [np.arange(0, len(y_data[0])) / x_axis_scale]
+        if context.settings['plot_event_bands']:
+            low, high = context.get_event_bands(channel)
+            y_data.append([low]*len(y_data[0]))
+            y_data.append([high]*len(y_data[0]))
+            x_data.append(x_data[0])
+            x_data.append(x_data[0])
     elif flavour == 'dens':
         kdes = _get_kdes(context, channels)
         x_data = [kde.support for kde in kdes]

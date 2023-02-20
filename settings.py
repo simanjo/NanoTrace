@@ -104,9 +104,14 @@ def _add_plot_settings(context: Context):
     with dpg.group(horizontal=True):
         # table like grouping, have labels in first group for auto alignment
         with dpg.group():
+            dpg.add_text("Show event bands:      ")
             dpg.add_text("x-axis labeling:")
             dpg.add_text("Random KDEs:")
         with dpg.group():
+            dpg.add_checkbox(
+                tag="show_bands", default_value=False,
+                callback=toggle_show_bands, user_data=context
+            )
             dpg.add_combo(
                 tag="axis_labeling", items=["datapoints", "seconds"],
                 default_value="datapoints",
@@ -298,6 +303,14 @@ def update_context_with_settings(
             dpg.configure_item("toggle_channels", show=False)
             dpg.configure_item("get_active_channels", show=True)
     user_data.dirty = False
+
+
+def toggle_show_bands(
+    sender: DpgItem,
+    app_data: Dict[str, Any],
+    user_data: Context
+) -> None:
+    user_data.settings['plot_event_bands'] = dpg.get_value(sender)
 
 
 def select_random_kdes(
