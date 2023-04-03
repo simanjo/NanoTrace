@@ -5,6 +5,7 @@ Tool to display squiggle plots of Oxforrd Nanopore bulk files plus some addition
 # Installation
 
 The easiest way is to use the respective binaries ([Windows v1.0.0](https://github.com/simanjo/NanoTrace/releases/download/v1.0.0/nanotrace.exe), Linux  (tbd)).
+Due to the end of support for Windows 8.1 only Windows 10 and later are supported (and the binary will most likely not run on older windows versions (due to the need to include the [universal crt](https://devblogs.microsoft.com/cppblog/introducing-the-universal-crt/)).
 
 For manual usage from source follow these steps which require a working python 3 installation (3.8, 3.9 and 3.10 are supported):
 ```
