@@ -1,6 +1,6 @@
 # NanoTrace
 
-Tool to display squiggle plots of Oxforrd Nanopore bulk files plus some additional information about the distribution of the raw signal in a channel. Nanotrace was developed as part of research to detect and quantify small molecules using nanopores (Quint, I. et al. Ready-to-use nanopore platform for ethanolamine quantification using an aptamer-based strand displacement assay. 2023.02.27.530168 Preprint at https://doi.org/10.1101/2023.02.27.530168 (2023))
+Tool to display squiggle plots of Oxforrd Nanopore bulk files plus some additional information about the distribution of the raw signal in a channel. Nanotrace was developed as part of research to detect and quantify small molecules using nanopores [Quint, I. et al. Ready-to-use nanopore platform for label-free small molecule quantification: Ethanolamine as first example](https://doi.org/10.1016/j.nano.2023.102724)
 
 # Installation
 
@@ -33,4 +33,4 @@ pyinstaller --windowed --onefile  --add-data ".\env\Lib\site-packages\vbz_h5py_p
 
 # Usage instructions
 
-NanoTrace consists of 3 components; an overview window, showing general information about the currently loaded file, a plot window, showing squiggle plots of selected channels or kernel density estimations for the whole run (to visualize the distribution of the raw signal) and a settings window. For more details also see the [supplementary files](https://www.biorxiv.org/content/10.1101/2023.02.27.530168v1.supplementary-material) accompanying the preprint.
+NanoTrace consists of 3 components; an overview window, showing general information about the currently loaded file, a plot window, showing squiggle plots of selected channels or kernel density estimations for the whole run (to visualize the distribution of the raw signal) and a settings window. For more details also see the [supplementary files](https://ars.els-cdn.com/content/image/1-s2.0-S1549963423000758-mmc1.docx) accompanying the publication.
