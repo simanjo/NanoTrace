@@ -27,8 +27,8 @@ cd NanoTrace
 # use pip to install the requirements (in a seperate virtual environment)
 python3 -m venv env
 pip3 install -r dev_requirements.txt
-# use pyinstaller to build a binary
-pyinstaller --windowed --onefile nanotrace.py
+# use pyinstaller to build a binary (assuming the virtual environment is placed in .\env)
+pyinstaller --windowed --onefile  --add-data ".\env\Lib\site-packages\vbz_h5py_plugin\lib\vbz_hdf_plugin.dll:vbz_h5py_plugin\lib\" nanotrace.py
 ```
 
 # Usage instructions
